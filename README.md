@@ -1,2 +1,2 @@
-# finanzapp
+# Finanz App
 Pavels Finanzapp
