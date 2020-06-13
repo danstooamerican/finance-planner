@@ -1,15 +1,15 @@
-import 'package:financeplanner/actions/actions.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/reducers/app_reducer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
+
+import 'middleware/middleware.dart';
 
 void main() {
-  final store = Store<AppState>(
-    appReducer,
-    initialState: AppState(counter: 0),
-  );
+  final store = Store<AppState>(appReducer,
+      initialState: AppState(counter: 0), middleware: [thunkMiddleware]);
 
   runApp(FinancePlanner(store: store, title: "Finance Planner"));
 }
@@ -38,7 +38,9 @@ class FinancePlanner extends StatelessWidget {
               children: <Widget>[
                 Text(
                   'Tichy announces:',
-                  style: Theme.of(context).textTheme.headline3,
+                  style: Theme.of(context).textTheme.headline3.merge(
+                        TextStyle(color: Colors.white),
+                      ),
                   textAlign: TextAlign.center,
                 ),
                 StoreConnector<AppState, String>(
@@ -47,7 +49,9 @@ class FinancePlanner extends StatelessWidget {
                   builder: (BuildContext context, String counter) {
                     return Text(
                       "SWT " + '$counter',
-                      style: Theme.of(context).textTheme.headline4,
+                      style: Theme.of(context).textTheme.headline4.merge(
+                            TextStyle(color: Colors.grey),
+                          ),
                     );
                   },
                 )
@@ -57,7 +61,7 @@ class FinancePlanner extends StatelessWidget {
           floatingActionButton: StoreConnector<AppState, VoidCallback>(
             converter: (store) {
               return () {
-                store.dispatch(new IncrementAction());
+                store.dispatch(accessDatabase(store.state.counter));
               };
             },
             builder: (BuildContext context, VoidCallback callback) {
