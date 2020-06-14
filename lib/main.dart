@@ -10,9 +10,8 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 void main() {
-  final store = Store<AppState>(appReducer,
-      initialState: AppState(transactions: new List()),
-      middleware: [thunkMiddleware]);
+  final store =
+      Store<AppState>(appReducer, initialState: AppState(transactions: new List()), middleware: [thunkMiddleware]);
 
   runApp(FinancePlanner(store: store, title: "Finance Planner"));
 }
@@ -36,14 +35,47 @@ class FinancePlanner extends StatelessWidget {
           ),
           body: StoreConnector<AppState, List<Transaction>>(
             converter: (Store<AppState> store) {
-              return store.state.transactions;
+              List<Transaction> sorted = store.state.transactions;
+              sorted.sort((t1, t2) => t2.date.compareTo(t1.date));
+
+              return sorted;
             },
             builder: (BuildContext context, List<Transaction> transactions) {
               return ListView.builder(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   itemCount: transactions.length,
                   itemBuilder: (BuildContext context, int index) {
-                    return new TransactionItem(transactions[index]);
+                    int current = index;
+                    int previous = index - 1;
+
+                    Transaction transaction = transactions[current];
+                    if (_isOnDifferentDayToPredecessor(transactions, current, previous)) {
+                      return new Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                                child: Text(
+                                  _getDate(transaction.date),
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                                ),
+                                padding: const EdgeInsets.fromLTRB(0, 16, 0, 0)),
+                            const Divider(
+                              color: Colors.grey,
+                              height: 12,
+                              thickness: 1,
+                              endIndent: 8,
+                            ),
+                            Padding(
+                              child: TransactionItem(transaction),
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                            )
+                          ],
+                        ),
+                      );
+                    } else {
+                      return new TransactionItem(transaction);
+                    }
                   });
             },
           ),
@@ -65,6 +97,33 @@ class FinancePlanner extends StatelessWidget {
       ),
     );
   }
+
+  bool _isOnDifferentDayToPredecessor(List<Transaction> transactions, int currentIndex, int previousIndex) {
+    if (currentIndex == 0) {
+      return true;
+    }
+
+    if (currentIndex < 0 ||
+        currentIndex >= transactions.length ||
+        previousIndex < 0 ||
+        previousIndex >= transactions.length) {
+      return false;
+    }
+
+    Transaction current = transactions[currentIndex];
+    Transaction previous = transactions[previousIndex];
+
+    DateTime currentDate = new DateTime(current.date.year, current.date.month, current.date.day);
+    DateTime previousDate = new DateTime(previous.date.year, previous.date.month, previous.date.day);
+
+    return currentDate.difference(previousDate).inDays.abs() >= 1;
+  }
+
+  String _getDate(DateTime date) {
+    DateFormat f = new DateFormat('dd.MM.yyyy');
+
+    return f.format(date);
+  }
 }
 
 class TransactionItem extends StatelessWidget {
@@ -74,7 +133,6 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Material is a conceptual piece of paper on which the UI appears.
     return Container(
       padding: const EdgeInsets.all(8),
       height: 50,
@@ -118,9 +176,7 @@ class TransactionItem extends StatelessWidget {
               children: [
                 Text(
                   _getAmount(transaction.amount),
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: _getAmountColor(transaction.amount)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: _getAmountColor(transaction.amount)),
                   textAlign: TextAlign.right,
                 )
               ],
