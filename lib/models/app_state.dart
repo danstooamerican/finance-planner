@@ -1,10 +1,9 @@
+import 'package:financeplanner/models/models.dart';
 import 'package:meta/meta.dart';
 
 @immutable
 class AppState {
-  final int counter;
+  final List<Transaction> transactions;
 
-  const AppState({
-    @required this.counter,
-  });
+  AppState({@required this.transactions});
 }
