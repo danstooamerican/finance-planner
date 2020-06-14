@@ -16,7 +16,7 @@ List<Transaction> _addTransaction(
     ..add(new Transaction(
         category: "category",
         description:
-            "descriptiosssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+            "Paid for some fancy dinner. A crab robbed me but a disguised hero saved me. He swung his yellow umbrella like a champ.",
         amount: 1000,
         date: DateTime.now()));
 }
