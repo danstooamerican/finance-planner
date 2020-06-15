@@ -9,6 +9,6 @@ ThunkAction<AppState> accessDatabase(int counter) {
 
     // use tutorial at https://pub.dev/packages/postgresql
 
-    store.dispatch(new IncrementAction());
+    store.dispatch(new AddTransactionAction());
   };
 }

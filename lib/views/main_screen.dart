@@ -10,9 +10,8 @@ import 'package:redux/redux.dart';
 
 class MainScreen extends StatelessWidget {
   final Store<AppState> store;
-  final String title;
 
-  MainScreen({Key key, this.store, this.title}) : super(key: key);
+  MainScreen({Key key, this.store}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +19,7 @@ class MainScreen extends StatelessWidget {
       store: store,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(title),
+          title: Text("Overview"),
         ),
         body: StoreConnector<AppState, List<Transaction>>(
           converter: (Store<AppState> store) {

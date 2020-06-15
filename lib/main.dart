@@ -13,5 +13,9 @@ void main() {
       Store<AppState>(appReducer, initialState: AppState(transactions: new List()), middleware: [thunkMiddleware]);
 
   runApp(MaterialApp(
-      title: 'FinanceApp', theme: ThemeData.dark(), home: MainScreen(store: store, title: "Finance Planner")));
+      title: 'Finance App',
+      theme: ThemeData.dark(),
+      home: MainScreen(
+        store: store,
+      )));
 }
