@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 class Transaction {
-  final DateTime date;
+  final DateTime dateTime;
   final String description;
   final String category;
   final double amount;
@@ -10,6 +10,10 @@ class Transaction {
     @required this.category,
     @required this.description,
     @required this.amount,
-    @required this.date,
+    @required this.dateTime,
   });
+
+  DateTime get date {
+    return new DateTime(dateTime.year, dateTime.month, dateTime.day);
+  }
 }

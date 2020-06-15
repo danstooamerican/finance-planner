@@ -8,6 +8,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
+import 'package:timer_builder/timer_builder.dart';
 
 void main() {
   final store =
@@ -36,7 +37,7 @@ class FinancePlanner extends StatelessWidget {
           body: StoreConnector<AppState, List<Transaction>>(
             converter: (Store<AppState> store) {
               List<Transaction> sorted = store.state.transactions;
-              sorted.sort((t1, t2) => t2.date.compareTo(t1.date));
+              sorted.sort((t1, t2) => t2.dateTime.compareTo(t1.dateTime));
 
               return sorted;
             },
@@ -55,10 +56,12 @@ class FinancePlanner extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                                child: Text(
-                                  _getDate(transaction.date),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                                ),
+                                child: TimerBuilder.periodic(Duration(seconds: 1), builder: (context) {
+                                  return Text(
+                                    _getDate(transaction.date),
+                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                                  );
+                                }),
                                 padding: const EdgeInsets.fromLTRB(0, 16, 0, 0)),
                             const Divider(
                               color: Colors.grey,
@@ -113,13 +116,15 @@ class FinancePlanner extends StatelessWidget {
     Transaction current = transactions[currentIndex];
     Transaction previous = transactions[previousIndex];
 
-    DateTime currentDate = new DateTime(current.date.year, current.date.month, current.date.day);
-    DateTime previousDate = new DateTime(previous.date.year, previous.date.month, previous.date.day);
-
-    return currentDate.difference(previousDate).inDays.abs() >= 1;
+    return current.date.difference(previous.date).inDays.abs() >= 1;
   }
 
   String _getDate(DateTime date) {
+    DateTime now = DateTime.now();
+    if (date.isAtSameMomentAs(new DateTime(now.year, now.month, now.day))) {
+      return "Today";
+    }
+
     DateFormat f = new DateFormat('dd.MM.yyyy');
 
     return f.format(date);
