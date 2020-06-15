@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:financeplanner/actions/actions.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
-import 'package:timer_builder/timer_builder.dart';
 
 void main() {
   final store =
@@ -56,12 +56,10 @@ class FinancePlanner extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                                child: TimerBuilder.periodic(Duration(seconds: 1), builder: (context) {
-                                  return Text(
-                                    _getDate(transaction.date),
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                                  );
-                                }),
+                                child: Text(
+                                  _getDate(transaction.date),
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                                ),
                                 padding: const EdgeInsets.fromLTRB(0, 16, 0, 0)),
                             const Divider(
                               color: Colors.grey,
@@ -161,12 +159,13 @@ class TransactionItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  child: Text(
+                  child: AutoSizeText(
                     transaction.description,
                     style: TextStyle(color: Colors.grey),
                     textAlign: TextAlign.left,
-                    overflow: TextOverflow.ellipsis,
+                    minFontSize: 14,
                     maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                 )
@@ -179,10 +178,12 @@ class TransactionItem extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
+                AutoSizeText(
                   _getAmount(transaction.amount),
                   style: TextStyle(fontWeight: FontWeight.bold, color: _getAmountColor(transaction.amount)),
                   textAlign: TextAlign.right,
+                  minFontSize: 8,
+                  maxLines: 1,
                 )
               ],
             ),
