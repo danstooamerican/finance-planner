@@ -13,7 +13,8 @@ final addTransactionReducer = TypedReducer<List<Transaction>, IncrementAction>(_
 List<Transaction> _addTransaction(List<Transaction> transactions, IncrementAction action) {
   Random rnd = new Random();
 
-  double amount = rnd.nextDouble() * 9999 * 2 - 9999;
+  double x = 100000;
+  double amount = rnd.nextDouble() * x * 2 - x;
 
   return List.from(transactions)
     ..add(new Transaction(
