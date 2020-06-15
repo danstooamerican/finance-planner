@@ -1,91 +1,83 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:financeplanner/actions/actions.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
+import 'package:financeplanner/views/add_transaction_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 
-class FinancePlanner extends StatelessWidget {
+class MainScreen extends StatelessWidget {
   final Store<AppState> store;
   final String title;
 
-  FinancePlanner({Key key, this.store, this.title}) : super(key: key);
+  MainScreen({Key key, this.store, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return StoreProvider<AppState>(
       store: store,
-      child: MaterialApp(
-        title: '$title',
-        theme: ThemeData.dark(),
-        home: Scaffold(
-          appBar: AppBar(
-            title: Text(title),
-          ),
-          body: StoreConnector<AppState, List<Transaction>>(
-            converter: (Store<AppState> store) {
-              List<Transaction> sorted = store.state.transactions;
-              sorted.sort((t1, t2) => t2.dateTime.compareTo(t1.dateTime));
-
-              return sorted;
-            },
-            builder: (BuildContext context, List<Transaction> transactions) {
-              return ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  itemCount: transactions.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    int current = index;
-                    int previous = index - 1;
-
-                    Transaction transaction = transactions[current];
-                    if (_isOnDifferentDayToPredecessor(transactions, current, previous)) {
-                      return new Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                                child: Text(
-                                  _getDate(transaction.date),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                                ),
-                                padding: const EdgeInsets.fromLTRB(0, 16, 0, 0)),
-                            const Divider(
-                              color: Colors.grey,
-                              height: 12,
-                              thickness: 1,
-                              endIndent: 8,
-                            ),
-                            Padding(
-                              child: TransactionItem(transaction),
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                            )
-                          ],
-                        ),
-                      );
-                    } else {
-                      return new TransactionItem(transaction);
-                    }
-                  });
-            },
-          ),
-          floatingActionButton: StoreConnector<AppState, VoidCallback>(
-            converter: (store) {
-              return () {
-                store.dispatch(new IncrementAction());
-              };
-            },
-            builder: (BuildContext context, VoidCallback callback) {
-              return FloatingActionButton(
-                onPressed: callback,
-                tooltip: 'Increment',
-                child: Icon(Icons.add),
-              );
-            },
-          ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(title),
         ),
+        body: StoreConnector<AppState, List<Transaction>>(
+          converter: (Store<AppState> store) {
+            List<Transaction> sorted = store.state.transactions;
+            sorted.sort((t1, t2) => t2.dateTime.compareTo(t1.dateTime));
+
+            return sorted;
+          },
+          builder: (BuildContext context, List<Transaction> transactions) {
+            return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                itemCount: transactions.length,
+                itemBuilder: (BuildContext context, int index) {
+                  int current = index;
+                  int previous = index - 1;
+
+                  Transaction transaction = transactions[current];
+                  if (_isOnDifferentDayToPredecessor(transactions, current, previous)) {
+                    return new Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                              child: Text(
+                                _getDate(transaction.date),
+                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                              ),
+                              padding: const EdgeInsets.fromLTRB(0, 16, 0, 0)),
+                          const Divider(
+                            color: Colors.grey,
+                            height: 12,
+                            thickness: 1,
+                            endIndent: 8,
+                          ),
+                          Padding(
+                            child: TransactionItem(transaction),
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                          )
+                        ],
+                      ),
+                    );
+                  } else {
+                    return new TransactionItem(transaction);
+                  }
+                });
+          },
+        ),
+        floatingActionButton: (FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddTransactionScreen(store: store)),
+            );
+          },
+          tooltip: 'Increment',
+          child: Icon(Icons.add),
+        )),
       ),
     );
   }
