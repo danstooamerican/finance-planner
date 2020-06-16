@@ -11,6 +11,7 @@ final addTransactionReducer = TypedReducer<List<Transaction>, AddTransactionActi
 List<Transaction> _addTransaction(List<Transaction> transactions, AddTransactionAction action) {
   return List.from(transactions)
     ..add(new Transaction(
+      id: action.id,
       category: action.category,
       description: action.description,
       amount: action.amount,
