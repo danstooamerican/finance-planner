@@ -4,6 +4,7 @@ import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
@@ -28,7 +29,25 @@ class AddTransactionState extends State<AddTransactionScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
+  final _prefixMoneyRegex = new RegExp(r'^[1-9][0-9]*(\,)?([0-9]{1,2})?$');
+  String previousAmountText;
+  TextSelection previousAmountSelection;
+
   AddTransactionState() {
+    amountController.addListener(() {
+      final String currentValue = amountController.text;
+
+      if (currentValue.length > 0 && _prefixMoneyRegex.matchAsPrefix(currentValue) == null) {
+        amountController.value = TextEditingValue(text: previousAmountText, selection: previousAmountSelection);
+      } else {
+        previousAmountText = currentValue;
+        previousAmountSelection = amountController.selection;
+      }
+    });
+
+    previousAmountText = amountController.text;
+    previousAmountSelection = amountController.selection;
+
     _setDate(DateTime.now());
   }
 
@@ -49,6 +68,7 @@ class AddTransactionState extends State<AddTransactionScreen> {
                 child: TextFormField(
                   controller: amountController,
                   keyboardType: TextInputType.number,
+                  textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Amount',
@@ -169,5 +189,14 @@ class AddTransactionState extends State<AddTransactionScreen> {
   void _setDate(DateTime date) {
     selectedDate = date;
     dateController.text = date.toDateFormat();
+  }
+
+  @override
+  void dispose() {
+    amountController.dispose();
+    dateController.dispose();
+    descriptionController.dispose();
+    categoryController.dispose();
+    super.dispose();
   }
 }
