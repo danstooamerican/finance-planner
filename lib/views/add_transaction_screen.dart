@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:financeplanner/actions/actions.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
@@ -8,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
-import 'package:flutter_masked_text/flutter_masked_text.dart';
 
 class AddTransactionScreen extends StatefulWidget {
   final Store<AppState> store;
@@ -22,11 +19,20 @@ class AddTransactionScreen extends StatefulWidget {
 }
 
 class AddTransactionState extends State<AddTransactionScreen> {
-  TextEditingController descriptionController = new TextEditingController();
-  MoneyMaskedTextController amountController = MoneyMaskedTextController(decimalSeparator: ',', thousandSeparator: '.');
-  TextEditingController dateController = new TextEditingController();
   DateTime selectedDate = DateTime.now();
+
+  final String moneyRegex = r'\-?([0-9]{1,3}\.([0-9]{3}\.)*[0-9]{3}|[0-9]+)(\,[0-9][0-9])?';
+
+  TextEditingController descriptionController = new TextEditingController();
+  TextEditingController amountController = TextEditingController();
+  TextEditingController dateController = new TextEditingController();
   TextEditingController categoryController = new TextEditingController();
+
+  final _formKey = GlobalKey<FormState>();
+
+  AddTransactionState() {
+    _setDate(DateTime.now());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,83 +40,122 @@ class AddTransactionState extends State<AddTransactionScreen> {
       store: widget.store,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Add transaction"),
+          title: Text("Add Transaction"),
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              child: TextField(
-                controller: descriptionController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Description",
-                ),
-              ),
-              padding: const EdgeInsets.all(8),
-            ),
-            Padding(
-              child: TextField(
-                controller: amountController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Amount",
-                ),
-              ),
-              padding: const EdgeInsets.all(8),
-            ),
-            Padding(
-              child: TextField(
-                onTap: () => _selectDate(context),
-                keyboardType: TextInputType.datetime,
-                controller: dateController,
-                readOnly: true,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Date",
-                ),
-              ),
-              padding: const EdgeInsets.all(8),
-            ),
-            Padding(
-              child: TextField(
-                controller: categoryController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: "Category",
-                ),
-              ),
-              padding: const EdgeInsets.all(8),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                StoreConnector<AppState, VoidCallback>(
-                  converter: (store) {
-                    return () {
-                      store.dispatch(AddTransactionAction(
-                        amount: amountController.numberValue,
-                        date: selectedDate,
-                        description: descriptionController.text,
-                        category: categoryController.text,
-                      ));
-                      Navigator.pop(context);
-                    };
-                  },
-                  builder: (context, callback) {
-                    return Expanded(
-                        child: Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: new RaisedButton(
-                              onPressed: callback,
-                              child: Text("Add"),
-                            )));
+        body: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                child: TextFormField(
+                  controller: amountController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Amount',
+                  ),
+                  validator: (text) {
+                    if (text == null || text.isEmpty) {
+                      return 'Amount is required';
+                    }
+
+                    RegExp regex = RegExp(moneyRegex);
+                    Match match = regex.firstMatch(text);
+                    if (match.end != text.length) {
+                      return "Invalid amount";
+                    }
+
+                    return null;
                   },
                 ),
-              ],
-            ),
-          ],
+                padding: const EdgeInsets.all(8),
+              ),
+              Padding(
+                child: TextFormField(
+                  controller: descriptionController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Description',
+                  ),
+                  validator: (text) {
+                    if (text == null || text.isEmpty) {
+                      return 'Description is required';
+                    }
+                    return null;
+                  },
+                ),
+                padding: const EdgeInsets.all(8),
+              ),
+              Padding(
+                child: TextFormField(
+                  controller: categoryController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Category',
+                  ),
+                  validator: (text) {
+                    if (text == null || text.isEmpty) {
+                      return 'Category is required';
+                    }
+                    return null;
+                  },
+                ),
+                padding: const EdgeInsets.all(8),
+              ),
+              Padding(
+                child: TextFormField(
+                  controller: dateController,
+                  onTap: () => _selectDate(context),
+                  keyboardType: TextInputType.number,
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Date',
+                  ),
+                  validator: (text) {
+                    if (text == null || text.isEmpty) {
+                      return 'Date is required';
+                    }
+                    return null;
+                  },
+                ),
+                padding: const EdgeInsets.all(8),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  StoreConnector<AppState, VoidCallback>(
+                    converter: (store) {
+                      return () {
+                        if (_formKey.currentState.validate()) {
+                          NumberFormat f = NumberFormat.currency(locale: "de_DE");
+
+                          store.dispatch(AddTransactionAction(
+                            amount: f.parse(amountController.text),
+                            date: selectedDate,
+                            description: descriptionController.text,
+                            category: categoryController.text,
+                          ));
+
+                          Navigator.pop(context);
+                        }
+                      };
+                    },
+                    builder: (context, callback) {
+                      return Expanded(
+                          child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: new RaisedButton(
+                                onPressed: callback,
+                                child: Text("Add"),
+                              )));
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -118,12 +163,19 @@ class AddTransactionState extends State<AddTransactionScreen> {
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
-        context: context, initialDate: selectedDate, firstDate: DateTime(2015, 8), lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
+        context: context, initialDate: selectedDate, firstDate: DateTime(1900), lastDate: DateTime(2200));
+
+    if (picked != null && picked != selectedDate) {
       setState(() {
-        selectedDate = picked;
+        _setDate(picked);
       });
+    }
+  }
+
+  void _setDate(DateTime date) {
+    selectedDate = date;
+
     DateFormat f = new DateFormat('dd.MM.yyyy');
-    dateController.text = f.format(selectedDate);
+    dateController.text = f.format(date);
   }
 }
