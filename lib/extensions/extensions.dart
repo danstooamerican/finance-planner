@@ -1,6 +1,8 @@
 import 'package:intl/intl.dart';
 
-extension RegexMatching on String {
+extension StringFormatting on String {
+  static final String moneyRegex = r'^(\-?[0-9]+(?:\,[0-9]{1,2})?)$';
+
   bool matches(RegExp regex) {
     Match match = regex.firstMatch(this);
 
@@ -21,8 +23,6 @@ extension RegexMatching on String {
   }
 
   bool isMoney() {
-    final String moneyRegex = r'^(\-?[0-9]+(?:\,[0-9]{1,2})?)$';
-
     return this.matches(RegExp(moneyRegex));
   }
 }
