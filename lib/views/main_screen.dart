@@ -1,11 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:financeplanner/extensions/extensions.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:financeplanner/views/add_transaction_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 
 class MainScreen extends StatelessWidget {
@@ -96,7 +96,7 @@ class MainScreen extends StatelessWidget {
     Transaction current = transactions[currentIndex];
     Transaction previous = transactions[previousIndex];
 
-    return current.date.difference(previous.date).inDays.abs() >= 1;
+    return current.date.isOnDifferentDay(previous.date);
   }
 
   String _getDate(DateTime date) {
@@ -105,9 +105,7 @@ class MainScreen extends StatelessWidget {
       return "Today";
     }
 
-    DateFormat f = new DateFormat('dd.MM.yyyy');
-
-    return f.format(date);
+    return date.toDateFormat();
   }
 }
 
@@ -161,7 +159,7 @@ class TransactionItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 AutoSizeText(
-                  _getAmount(transaction.amount),
+                  transaction.amount.toMoneyFormatWithSign(),
                   style: TextStyle(fontWeight: FontWeight.bold, color: _getAmountColor(transaction.amount)),
                   textAlign: TextAlign.right,
                   minFontSize: 8,
@@ -174,12 +172,6 @@ class TransactionItem extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _getAmount(double amount) {
-    NumberFormat f = NumberFormat.currency(locale: "de_DE", symbol: "€");
-
-    return (amount > 0 ? "+" : "") + f.format(amount);
   }
 
   Color _getAmountColor(double amount) {

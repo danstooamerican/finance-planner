@@ -1,10 +1,10 @@
 import 'package:financeplanner/actions/actions.dart';
+import 'package:financeplanner/extensions/extensions.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 
 class AddTransactionScreen extends StatefulWidget {
@@ -20,8 +20,6 @@ class AddTransactionScreen extends StatefulWidget {
 
 class AddTransactionState extends State<AddTransactionScreen> {
   DateTime selectedDate = DateTime.now();
-
-  final String moneyRegex = r'\-?([0-9]{1,3}\.([0-9]{3}\.)*[0-9]{3}|[0-9]+)(\,[0-9][0-9])?';
 
   TextEditingController descriptionController = new TextEditingController();
   TextEditingController amountController = TextEditingController();
@@ -60,9 +58,7 @@ class AddTransactionState extends State<AddTransactionScreen> {
                       return 'Amount is required';
                     }
 
-                    RegExp regex = RegExp(moneyRegex);
-                    Match match = regex.firstMatch(text);
-                    if (match.end != text.length) {
+                    if (!text.isMoney()) {
                       return "Invalid amount";
                     }
 
@@ -129,10 +125,8 @@ class AddTransactionState extends State<AddTransactionScreen> {
                     converter: (store) {
                       return () {
                         if (_formKey.currentState.validate()) {
-                          NumberFormat f = NumberFormat.currency(locale: "de_DE");
-
                           store.dispatch(AddTransactionAction(
-                            amount: f.parse(amountController.text),
+                            amount: amountController.text.parseMoney(),
                             date: selectedDate,
                             description: descriptionController.text,
                             category: categoryController.text,
@@ -174,8 +168,6 @@ class AddTransactionState extends State<AddTransactionScreen> {
 
   void _setDate(DateTime date) {
     selectedDate = date;
-
-    DateFormat f = new DateFormat('dd.MM.yyyy');
-    dateController.text = f.format(date);
+    dateController.text = date.toDateFormat();
   }
 }
