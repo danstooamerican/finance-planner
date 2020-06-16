@@ -24,7 +24,15 @@ class MainScreen extends StatelessWidget {
         body: StoreConnector<AppState, List<Transaction>>(
           converter: (Store<AppState> store) {
             List<Transaction> sorted = store.state.transactions;
-            sorted.sort((t1, t2) => t2.dateTime.compareTo(t1.dateTime));
+            sorted.sort((t1, t2) {
+              int dateCompare = t2.dateTime.compareTo(t1.dateTime);
+
+              if (dateCompare == 0) {
+                return t2.id.compareTo(t1.id);
+              }
+
+              return dateCompare;
+            });
 
             return sorted;
           },
