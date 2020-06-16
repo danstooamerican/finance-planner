@@ -13,7 +13,7 @@ extension StringFormatting on String {
     NumberFormat f = NumberFormat.currency(locale: "de_DE");
 
     int sign = 1;
-    String toFormat = this;
+    String toFormat = sanitizeMoneyString(this);
     if (this.startsWith("-")) {
       toFormat = this.substring(1);
       sign = -1;
@@ -23,8 +23,12 @@ extension StringFormatting on String {
   }
 
   bool isMoney() {
-    return this.matches(RegExp(moneyRegex));
+    return sanitizeMoneyString(this).matches(RegExp(moneyRegex));
   }
+}
+
+String sanitizeMoneyString(String money) {
+  return money.replaceAll(".", ",");
 }
 
 extension DateTimeFormatting on DateTime {
