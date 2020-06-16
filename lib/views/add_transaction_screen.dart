@@ -1,5 +1,6 @@
 import 'package:financeplanner/actions/actions.dart';
 import 'package:financeplanner/extensions/extensions.dart';
+import 'package:financeplanner/middleware/middleware.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:flutter/cupertino.dart';
@@ -145,7 +146,7 @@ class AddTransactionState extends State<AddTransactionScreen> {
                     converter: (store) {
                       return () {
                         if (_formKey.currentState.validate()) {
-                          store.dispatch(AddTransactionAction(
+                          store.dispatch(createTransaction(
                             amount: amountController.text.parseMoney(),
                             date: selectedDate,
                             description: descriptionController.text,
