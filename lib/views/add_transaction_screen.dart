@@ -34,7 +34,7 @@ class AddTransactionState extends State<AddTransactionScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
-  final _prefixMoneyRegex = new RegExp(r'^-?([1-9][0-9]*)?(\,|\.)?([0-9]{1,2})?$');
+  final _prefixMoneyRegex = new RegExp(r'^-?([1-9][0-9]*(\,|\.)?)?([0-9]{1,2})?$');
   String previousAmountText;
   TextSelection previousAmountSelection;
 
