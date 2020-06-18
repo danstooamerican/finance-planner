@@ -32,21 +32,28 @@ ThunkAction<AppState> createTransaction({double amount, DateTime date, String de
 
 ThunkAction<AppState> fetchTransactions() {
   return (Store<AppState> store) async {
-    List<Transaction> transactions = List();
+    http.get(
+      'http://10.0.2.2:8080/transactions',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    ).then((value) {
+      List<Transaction> transactions = List();
 
-    for (int i = 0; i < 7; i++) {
-      transactions.add(
-        Transaction(
-          id: 1,
-          amount: 3,
-          category: "cate",
-          dateTime: DateTime.now(),
-          description: "from API",
-        ),
-      );
-    }
+      for (int i = 0; i < 7; i++) {
+        transactions.add(
+          Transaction(
+            id: 1,
+            amount: 3,
+            category: "cate",
+            dateTime: DateTime.now(),
+            description: "fetched from API",
+          ),
+        );
+      }
 
-    store.dispatch(AddTransactionAction.multiple(transactions: transactions, overrideExisting: true));
+      store.dispatch(AddTransactionAction.multiple(transactions: transactions, overrideExisting: true));
+    });
   };
 }
 
