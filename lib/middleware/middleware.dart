@@ -12,7 +12,7 @@ ThunkAction<AppState> createTransaction({double amount, DateTime date, String de
   return (Store<AppState> store) async {
     return http
         .post(
-      'http://10.0.2.2:8080/add-transaction',
+      'http://zwerschke.net:2000/add-transaction',
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -33,24 +33,13 @@ ThunkAction<AppState> createTransaction({double amount, DateTime date, String de
 ThunkAction<AppState> fetchTransactions() {
   return (Store<AppState> store) async {
     http.get(
-      'http://10.0.2.2:8080/transactions',
+      'http://zwerschke.net:2000/transactions',
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
     ).then((value) {
-      List<Transaction> transactions = List();
-
-      for (int i = 0; i < 7; i++) {
-        transactions.add(
-          Transaction(
-            id: 1,
-            amount: 3,
-            category: "cate",
-            dateTime: DateTime.now(),
-            description: "fetched from API",
-          ),
-        );
-      }
+      Iterable list = json.decode(value.body);
+       List<Transaction> transactions = list.map((model) => Transaction.fromJson(model)).toList();
 
       store.dispatch(AddTransactionAction.multiple(transactions: transactions, overrideExisting: true));
     });
@@ -68,8 +57,8 @@ class TransactionDTO {
   TransactionDTO.fromJson(Map<String, dynamic> json)
       : amount = json['amount'],
         category = json['category'],
-        date = json['date'],
-        description = json['email'];
+        date = DateTime.parse(json['date']),
+        description = json['description'];
 
   Map<String, dynamic> toJson() {
     return {
