@@ -38,8 +38,8 @@ ThunkAction<AppState> fetchTransactions() {
         'Content-Type': 'application/json; charset=UTF-8',
       },
     ).then((value) {
-      Iterable list = json.decode(value.body);
-       List<Transaction> transactions = list.map((model) => Transaction.fromJson(model)).toList();
+      Iterable list = json.decode(utf8.decode(value.bodyBytes));
+      List<Transaction> transactions = list.map((model) => Transaction.fromJson(model)).toList();
 
       store.dispatch(AddTransactionAction.multiple(transactions: transactions, overrideExisting: true));
     });
