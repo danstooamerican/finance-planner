@@ -94,7 +94,6 @@ class MainScreen extends StatelessWidget {
   }
 
   Future<Null> updateTransactionList() async {
-    await Future.delayed(new Duration(seconds: 2));
     store.dispatch(fetchTransactions());
 
     return null;

@@ -18,4 +18,21 @@ class Transaction {
   DateTime get date {
     return new DateTime(dateTime.year, dateTime.month, dateTime.day);
   }
+
+  Transaction.fromJson(Map<String, dynamic> json)
+      : amount = json['amount'],
+        id = json['id'],
+        category = json['category'],
+        dateTime = DateTime.parse(json['date']),
+        description = json['description'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'amount': amount,
+      'description': description,
+      'category': category,
+      'date': date.toString().substring(0, 10),
+    };
+  }
 }
