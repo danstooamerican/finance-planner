@@ -1,3 +1,4 @@
+import 'package:financeplanner/middleware/middleware.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:financeplanner/reducers/app_reducer.dart';
@@ -11,6 +12,8 @@ import 'views/main_screen.dart';
 void main() {
   final store =
       Store<AppState>(appReducer, initialState: AppState(transactions: new List()), middleware: [thunkMiddleware]);
+
+  store.dispatch(fetchTransactions());
 
   runApp(MaterialApp(
       title: 'Finance App',
