@@ -12,19 +12,41 @@ ThunkAction<AppState> createTransaction({double amount, DateTime date, String de
   return (Store<AppState> store) async {
     return http
         .post(
-          'http://10.0.2.2:8080/add-transaction',
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(transaction),
-        )
-        .then((value) => store.dispatch(AddTransactionAction(
-              id: int.parse(value.body),
-              date: transaction.date,
-              description: transaction.description,
-              amount: transaction.amount,
-              category: transaction.category,
-            )));
+      'http://10.0.2.2:8080/add-transaction',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(transaction),
+    )
+        .then((value) {
+      store.dispatch(AddTransactionAction.single(
+        id: int.parse(value.body),
+        date: transaction.date,
+        description: transaction.description,
+        amount: transaction.amount,
+        category: transaction.category,
+      ));
+    });
+  };
+}
+
+ThunkAction<AppState> fetchTransactions() {
+  return (Store<AppState> store) async {
+    List<Transaction> transactions = List();
+
+    for (int i = 0; i < 7; i++) {
+      transactions.add(
+        Transaction(
+          id: 1,
+          amount: 3,
+          category: "cate",
+          dateTime: DateTime.now(),
+          description: "from API",
+        ),
+      );
+    }
+
+    store.dispatch(AddTransactionAction.multiple(transactions: transactions, overrideExisting: true));
   };
 }
 
