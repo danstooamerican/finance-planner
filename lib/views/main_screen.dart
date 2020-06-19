@@ -16,81 +16,125 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StoreProvider<AppState>(
-      store: store,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Overview"),
-        ),
-        body: StoreConnector<AppState, List<Transaction>>(
-          converter: (Store<AppState> store) {
-            List<Transaction> sorted = store.state.transactions;
-            sorted.sort((t1, t2) {
-              int dateCompare = t2.dateTime.compareTo(t1.dateTime);
+    return SafeArea(
+      child: StoreProvider<AppState>(
+        store: store,
+        child: Scaffold(
+          body: StoreConnector<AppState, List<Transaction>>(
+            converter: (Store<AppState> store) {
+              List<Transaction> sorted = store.state.transactions;
+              sorted.sort((t1, t2) {
+                int dateCompare = t2.dateTime.compareTo(t1.dateTime);
 
-              if (dateCompare == 0) {
-                return t2.id.compareTo(t1.id);
-              }
+                if (dateCompare == 0) {
+                  return t2.id.compareTo(t1.id);
+                }
 
-              return dateCompare;
-            });
+                return dateCompare;
+              });
 
-            return sorted;
-          },
-          builder: (BuildContext context, List<Transaction> transactions) {
-            return RefreshIndicator(
-              child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  itemCount: transactions.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    int current = index;
-                    int previous = index - 1;
+              return sorted;
+            },
+            builder: (BuildContext context, List<Transaction> transactions) {
+              double balance = _getBalance(transactions);
 
-                    Transaction transaction = transactions[current];
-                    if (_isOnDifferentDayToPredecessor(transactions, current, previous)) {
-                      return new Container(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                                child: Text(
-                                  _getDate(transaction.date),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                                ),
-                                padding: const EdgeInsets.fromLTRB(0, 16, 0, 0)),
-                            const Divider(
-                              color: Colors.grey,
-                              height: 12,
-                              thickness: 1,
-                              endIndent: 8,
-                            ),
-                            Padding(
-                              child: TransactionItem(transaction),
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                            )
-                          ],
+              return RefreshIndicator(
+                child: CustomScrollView(
+                  semanticChildCount: transactions.length,
+                  slivers: <Widget>[
+                    SliverAppBar(
+                      pinned: true,
+                      expandedHeight: 220.0,
+                      flexibleSpace: FlexibleSpaceBar(
+                        title: Transform.translate(
+                          offset: const Offset(-40, 0),
+                          child: Text('Overview'),
                         ),
-                      );
-                    } else {
-                      return new TransactionItem(transaction);
-                    }
-                  }),
-              onRefresh: updateTransactionList,
-            );
-          },
+                        background: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              AutoSizeText(
+                                "Balance",
+                                style: TextStyle(color: Colors.grey),
+                                textAlign: TextAlign.left,
+                                minFontSize: 30,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              AutoSizeText(
+                                balance.toMoneyFormatWithSign(),
+                                style: TextStyle(color: _getAmountColor(balance)),
+                                textAlign: TextAlign.left,
+                                minFontSize: 50,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          return _buildTransactionListItem(transactions, index);
+                        },
+                        childCount: transactions.length,
+                      ),
+                    ),
+                  ],
+                ),
+                onRefresh: updateTransactionList,
+              );
+            },
+          ),
+          floatingActionButton: (FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddTransactionScreen(store: store)),
+              );
+            },
+            tooltip: 'Add Transaction',
+            child: Icon(Icons.add),
+          )),
         ),
-        floatingActionButton: (FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AddTransactionScreen(store: store)),
-            );
-          },
-          tooltip: 'Increment',
-          child: Icon(Icons.add),
-        )),
       ),
     );
+  }
+
+  Widget _buildTransactionListItem(List<Transaction> transactions, int index) {
+    int current = index;
+    int previous = index - 1;
+
+    Transaction transaction = transactions[current];
+    if (_isOnDifferentDayToPredecessor(transactions, current, previous)) {
+      return new Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              child: Text(
+                _getDate(transaction.date),
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+            ),
+            const Divider(
+              color: Colors.grey,
+              height: 12,
+              thickness: 1,
+              endIndent: 8,
+            ),
+            Padding(
+              child: TransactionItem(transaction),
+              padding: const EdgeInsets.only(top: 8),
+            )
+          ],
+        ),
+      );
+    } else {
+      return new TransactionItem(transaction);
+    }
   }
 
   Future<Null> updateTransactionList() async {
@@ -125,6 +169,20 @@ class MainScreen extends StatelessWidget {
 
     return date.toDateFormat();
   }
+
+  double _getBalance(List<Transaction> transaction) {
+    return transaction.fold(0, (previousValue, Transaction element) => previousValue + element.amount);
+  }
+}
+
+Color _getAmountColor(double amount) {
+  if (amount < 0) {
+    return Colors.red;
+  } else if (amount == 0) {
+    return Colors.white;
+  } else {
+    return Colors.green;
+  }
 }
 
 class TransactionItem extends StatelessWidget {
@@ -134,71 +192,27 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      height: 50,
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.card_giftcard,
-                color: Colors.white,
-                size: 30.0,
-              ),
-            ],
-          ),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  child: AutoSizeText(
-                    transaction.description,
-                    style: TextStyle(color: Colors.grey),
-                    textAlign: TextAlign.left,
-                    minFontSize: 14,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                )
-              ],
-            ),
-            flex: 14,
-          ),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                AutoSizeText(
-                  transaction.amount.toMoneyFormatWithSign(),
-                  style: TextStyle(fontWeight: FontWeight.bold, color: _getAmountColor(transaction.amount)),
-                  textAlign: TextAlign.right,
-                  minFontSize: 8,
-                  maxLines: 1,
-                )
-              ],
-            ),
-            flex: 4,
-          )
-        ],
+    return ListTile(
+      leading: Icon(
+        Icons.card_giftcard,
+        color: Colors.white,
+        size: 30.0,
+      ),
+      title: AutoSizeText(
+        transaction.description,
+        style: TextStyle(color: Colors.grey),
+        textAlign: TextAlign.left,
+        minFontSize: 14,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      trailing: AutoSizeText(
+        transaction.amount.toMoneyFormatWithSign(),
+        style: TextStyle(fontWeight: FontWeight.bold, color: _getAmountColor(transaction.amount)),
+        textAlign: TextAlign.right,
+        minFontSize: 8,
+        maxLines: 1,
       ),
     );
-  }
-
-  Color _getAmountColor(double amount) {
-    if (amount < 0) {
-      return Colors.red;
-    } else if (amount == 0) {
-      return Colors.white;
-    } else {
-      return Colors.green;
-    }
   }
 }
