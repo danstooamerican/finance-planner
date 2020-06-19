@@ -48,9 +48,15 @@ extension DateTimeFormatting on DateTime {
 
 extension DoubleFormatting on double {
   String toMoneyFormatWithSign() {
-    NumberFormat f = NumberFormat.currency(locale: "de_DE", symbol: "€");
+    NumberFormat moneyFormat = NumberFormat.currency(locale: "de_DE", symbol: "€");
 
-    return (this > 0 ? "+" : "") + f.format(this);
+    return (this > 0 ? "+" : "") + moneyFormat.format(this);
+  }
+
+  String formatMoneyToEdit() {
+    NumberFormat moneyFormat = NumberFormat.currency(locale: "de_DE", symbol: "");
+
+    return moneyFormat.format(this).replaceAll(".", "").trim();
   }
 
   Color toMoneyColor() {

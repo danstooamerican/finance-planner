@@ -7,10 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-ThunkAction<AppState> createTransaction(
-    {double amount, DateTime date, String description, String category}) {
-  TransactionDTO transaction = TransactionDTO(
-      category: category, description: description, amount: amount, date: date);
+ThunkAction<AppState> createTransaction({Transaction transaction}) {
   return (Store<AppState> store) async {
     return http
         .post(
@@ -55,35 +52,9 @@ ThunkAction<AppState> fetchTransactions() {
       },
     ).then((value) {
       Iterable list = json.decode(utf8.decode(value.bodyBytes));
-      List<Transaction> transactions =
-          list.map((model) => Transaction.fromJson(model)).toList();
+      List<Transaction> transactions = list.map((model) => Transaction.fromJson(model)).toList();
 
-      store.dispatch(AddTransactionAction.multiple(
-          transactions: transactions, overrideExisting: true));
+      store.dispatch(AddTransactionAction.multiple(transactions: transactions, overrideExisting: true));
     });
   };
-}
-
-class TransactionDTO {
-  final String category;
-  final String description;
-  final double amount;
-  final DateTime date;
-
-  TransactionDTO({this.category, this.description, this.amount, this.date});
-
-  TransactionDTO.fromJson(Map<String, dynamic> json)
-      : amount = json['amount'],
-        category = json['category'],
-        date = DateTime.parse(json['date']),
-        description = json['description'];
-
-  Map<String, dynamic> toJson() {
-    return {
-      'amount': amount,
-      'description': description,
-      'category': category,
-      'date': date.toString().substring(0, 10), //TODO: make this more robust
-    };
-  }
 }
