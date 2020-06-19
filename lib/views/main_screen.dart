@@ -213,7 +213,6 @@ class TransactionItem extends StatelessWidget {
         maxLines: 1,
       ),
       onTap: () {
-        print(transaction);
         Navigator.push(
           context,
           MaterialPageRoute(

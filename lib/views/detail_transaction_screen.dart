@@ -23,9 +23,9 @@ class DetailTransactionScreen extends StatefulWidget {
 }
 
 class DetailTransactionState extends State<DetailTransactionScreen> {
-  final Transaction transaction;
+  Transaction transaction;
 
-  DetailTransactionState(this.transaction) {}
+  DetailTransactionState(this.transaction);
 
   @override
   Widget build(BuildContext context) {
@@ -109,8 +109,8 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
           ],
         ),
         floatingActionButton: (FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            final Transaction editedTransaction = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => EditTransactionScreen(
@@ -119,8 +119,11 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
                 ),
               ),
             );
+            setState(() {
+              transaction = editedTransaction;
+            });
           },
-          tooltip: 'Add Transaction',
+          tooltip: 'Edit Transaction',
           child: Icon(Icons.edit),
         )),
       ),

@@ -198,15 +198,16 @@ class EditTransactionState extends State<EditTransactionScreen> {
 
   void submitAction() {
     if (_formKey.currentState.validate()) {
-      widget.store.dispatch(editTransaction(new Transaction(
+      final Transaction editedTransaction = Transaction(
         id: widget.transaction.id,
         category: _categoryController.text,
         description: _descriptionController.text,
         amount: _amountController.text.parseMoney(),
         dateTime: selectedDate,
-      )));
+      );
+      widget.store.dispatch(editTransaction(editedTransaction));
 
-      Navigator.pop(context);
+      Navigator.pop(context, editedTransaction);
     }
   }
 
