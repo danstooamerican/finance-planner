@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 extension StringFormatting on String {
@@ -48,5 +51,15 @@ extension DoubleFormatting on double {
     NumberFormat f = NumberFormat.currency(locale: "de_DE", symbol: "€");
 
     return (this > 0 ? "+" : "") + f.format(this);
+  }
+
+  Color toMoneyColor() {
+    if (this < 0) {
+      return Colors.red;
+    } else if (this == 0) {
+      return Colors.white;
+    } else {
+      return Colors.green;
+    }
   }
 }
