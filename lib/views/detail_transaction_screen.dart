@@ -1,11 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:financeplanner/extensions/extensions.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:financeplanner/extensions/extensions.dart';
 
 import 'edit_transaction_screen.dart';
 
@@ -13,8 +13,7 @@ class DetailTransactionScreen extends StatefulWidget {
   final Store<AppState> store;
   final Transaction transaction;
 
-  DetailTransactionScreen({Key key, this.store, this.transaction})
-      : super(key: key);
+  DetailTransactionScreen({Key key, this.store, this.transaction}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -71,8 +70,7 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
                       decoration: BoxDecoration(color: const Color(0xff3b3f42)),
                       child: AutoSizeText(
                         transaction.amount.toMoneyFormatWithSign(),
-                        style:
-                            TextStyle(color: transaction.amount.toMoneyColor()),
+                        style: TextStyle(color: transaction.amount.toMoneyColor()),
                         textAlign: TextAlign.center,
                         minFontSize: 30,
                         overflow: TextOverflow.ellipsis,
@@ -119,9 +117,12 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
                 ),
               ),
             );
-            setState(() {
-              transaction = editedTransaction;
-            });
+
+            if (editedTransaction != null) {
+              setState(() {
+                transaction = editedTransaction;
+              });
+            }
           },
           tooltip: 'Edit Transaction',
           child: Icon(Icons.edit),
