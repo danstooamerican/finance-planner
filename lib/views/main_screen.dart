@@ -4,11 +4,12 @@ import 'package:financeplanner/middleware/middleware.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:financeplanner/views/add_transaction_screen.dart';
-import 'package:financeplanner/views/edit_transaction_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+
+import 'detail_transaction_screen.dart';
 
 class MainScreen extends StatelessWidget {
   final Store<AppState> store;
@@ -64,8 +65,7 @@ class MainScreen extends StatelessWidget {
                               ),
                               AutoSizeText(
                                 balance.toMoneyFormatWithSign(),
-                                style:
-                                    TextStyle(color: _getAmountColor(balance)),
+                                style: TextStyle(color: balance.toMoneyColor()),
                                 textAlign: TextAlign.left,
                                 minFontSize: 50,
                                 overflow: TextOverflow.ellipsis,
@@ -111,7 +111,7 @@ class MainScreen extends StatelessWidget {
 
     Transaction transaction = transactions[current];
     if (_isOnDifferentDayToPredecessor(transactions, current, previous)) {
-      return new Container(
+      return Container(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -181,16 +181,6 @@ class MainScreen extends StatelessWidget {
   }
 }
 
-Color _getAmountColor(double amount) {
-  if (amount < 0) {
-    return Colors.red;
-  } else if (amount == 0) {
-    return Colors.white;
-  } else {
-    return Colors.green;
-  }
-}
-
 class TransactionItem extends StatelessWidget {
   final Store<AppState> store;
   final Transaction transaction;
@@ -217,7 +207,7 @@ class TransactionItem extends StatelessWidget {
         transaction.amount.toMoneyFormatWithSign(),
         style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: _getAmountColor(transaction.amount)),
+            color: transaction.amount.toMoneyColor()),
         textAlign: TextAlign.right,
         minFontSize: 8,
         maxLines: 1,
@@ -227,10 +217,11 @@ class TransactionItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => EditTransactionScreen(
-                    store: store,
-                    transaction: transaction,
-                  )),
+            builder: (context) => DetailTransactionScreen(
+              store: store,
+              transaction: transaction,
+            ),
+          ),
         );
       },
     );
