@@ -4,6 +4,7 @@ import 'package:financeplanner/middleware/middleware.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:financeplanner/views/add_transaction_screen.dart';
+import 'package:financeplanner/views/edit_transaction_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -63,7 +64,8 @@ class MainScreen extends StatelessWidget {
                               ),
                               AutoSizeText(
                                 balance.toMoneyFormatWithSign(),
-                                style: TextStyle(color: _getAmountColor(balance)),
+                                style:
+                                    TextStyle(color: _getAmountColor(balance)),
                                 textAlign: TextAlign.left,
                                 minFontSize: 50,
                                 overflow: TextOverflow.ellipsis,
@@ -91,7 +93,8 @@ class MainScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddTransactionScreen(store: store)),
+                MaterialPageRoute(
+                    builder: (context) => AddTransactionScreen(store: store)),
               );
             },
             tooltip: 'Add Transaction',
@@ -115,9 +118,10 @@ class MainScreen extends StatelessWidget {
             Padding(
               child: Text(
                 _getDate(transaction.date),
-                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
               ),
-              padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+              padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),
             ),
             const Divider(
               color: Colors.grey,
@@ -126,14 +130,14 @@ class MainScreen extends StatelessWidget {
               endIndent: 8,
             ),
             Padding(
-              child: TransactionItem(transaction),
+              child: TransactionItem(transaction, store),
               padding: const EdgeInsets.only(top: 8),
             )
           ],
         ),
       );
     } else {
-      return new TransactionItem(transaction);
+      return new TransactionItem(transaction, store);
     }
   }
 
@@ -143,7 +147,8 @@ class MainScreen extends StatelessWidget {
     return null;
   }
 
-  bool _isOnDifferentDayToPredecessor(List<Transaction> transactions, int currentIndex, int previousIndex) {
+  bool _isOnDifferentDayToPredecessor(
+      List<Transaction> transactions, int currentIndex, int previousIndex) {
     if (currentIndex == 0) {
       return true;
     }
@@ -171,7 +176,8 @@ class MainScreen extends StatelessWidget {
   }
 
   double _getBalance(List<Transaction> transaction) {
-    return transaction.fold(0, (previousValue, Transaction element) => previousValue + element.amount);
+    return transaction.fold(0,
+        (previousValue, Transaction element) => previousValue + element.amount);
   }
 }
 
@@ -186,9 +192,10 @@ Color _getAmountColor(double amount) {
 }
 
 class TransactionItem extends StatelessWidget {
-  TransactionItem(this.transaction);
-
+  final Store<AppState> store;
   final Transaction transaction;
+
+  TransactionItem(this.transaction, this.store);
 
   @override
   Widget build(BuildContext context) {
@@ -208,11 +215,24 @@ class TransactionItem extends StatelessWidget {
       ),
       trailing: AutoSizeText(
         transaction.amount.toMoneyFormatWithSign(),
-        style: TextStyle(fontWeight: FontWeight.bold, color: _getAmountColor(transaction.amount)),
+        style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: _getAmountColor(transaction.amount)),
         textAlign: TextAlign.right,
         minFontSize: 8,
         maxLines: 1,
       ),
+      onTap: () {
+        print(transaction);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => EditTransactionScreen(
+                    store: store,
+                    transaction: transaction,
+                  )),
+        );
+      },
     );
   }
 }
