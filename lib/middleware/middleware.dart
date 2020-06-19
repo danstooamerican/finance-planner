@@ -17,15 +17,19 @@ ThunkAction<AppState> createTransaction({Transaction transaction}) {
       },
       body: jsonEncode(transaction),
     )
-        .then((value) {
-      store.dispatch(AddTransactionAction.single(
-        id: int.parse(value.body),
-        date: transaction.date,
-        description: transaction.description,
-        amount: transaction.amount,
-        category: transaction.category,
-      ));
-    });
+        .then(
+      (value) {
+        store.dispatch(
+          AddTransactionAction.single(
+            id: int.parse(value.body),
+            date: transaction.date,
+            description: transaction.description,
+            amount: transaction.amount,
+            category: transaction.category,
+          ),
+        );
+      },
+    );
   };
 }
 
@@ -39,7 +43,25 @@ ThunkAction<AppState> editTransaction(Transaction transaction) {
           },
           body: jsonEncode(transaction),
         )
-        .then((value) => store.dispatch(fetchTransactions()));
+        .then(
+          (value) => store.dispatch(fetchTransactions()),
+        );
+  };
+}
+
+ThunkAction<AppState> deleteTransaction(int id) {
+  return (Store<AppState> store) async {
+    return http
+        .post(
+          'http://zwerschke.net:2000/delete-transaction',
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(id),
+        )
+        .then(
+          (value) => store.dispatch(fetchTransactions()),
+        );
   };
 }
 

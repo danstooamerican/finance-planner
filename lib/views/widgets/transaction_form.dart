@@ -1,16 +1,19 @@
 import 'package:financeplanner/extensions/extensions.dart';
-import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
 class TransactionForm extends StatefulWidget {
   final Transaction transaction;
 
-  final String submitText;
-  final Function(Transaction) onSuccess;
+  final String primaryActionText;
+  final String secondaryActionText;
+
+  final Function(Transaction) primaryAction;
+
+  //// No form checks are performed before this action is called.
+  final Function(Transaction) secondaryAction;
 
   factory TransactionForm.empty({Key key, Function(Transaction) onSuccess, String submitText = "Save"}) {
     Transaction transaction = new Transaction(
@@ -24,12 +27,19 @@ class TransactionForm extends StatefulWidget {
     return TransactionForm.filled(
       key: key,
       transaction: transaction,
-      onSuccess: onSuccess,
-      submitText: submitText,
+      primaryAction: onSuccess,
+      primaryActionText: submitText,
     );
   }
 
-  TransactionForm.filled({Key key, this.transaction, this.onSuccess, this.submitText = "Save"}) : super(key: key);
+  TransactionForm.filled({
+    Key key,
+    @required this.transaction,
+    @required this.primaryAction,
+    this.secondaryAction,
+    this.primaryActionText = "Save",
+    this.secondaryActionText = "Delete",
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -159,7 +169,7 @@ class TransactionFormState extends State<TransactionForm> {
               textInputAction: TextInputAction.done,
               focusNode: _categoryFocus,
               onFieldSubmitted: (term) {
-                submitAction();
+                submitPrimaryAction();
               },
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
@@ -177,30 +187,39 @@ class TransactionFormState extends State<TransactionForm> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              StoreConnector<AppState, VoidCallback>(
-                converter: (store) {
-                  return () {
-                    submitAction();
-                  };
-                },
-                builder: (context, callback) {
-                  return Expanded(
-                      child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: new RaisedButton(
-                            onPressed: callback,
-                            child: Text(widget.submitText),
-                          )));
-                },
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: new RaisedButton(
+                    onPressed: submitPrimaryAction,
+                    child: Text(widget.primaryActionText),
+                  ),
+                ),
               ),
             ],
           ),
+          if (widget.secondaryAction != null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: new RaisedButton(
+                      color: Colors.red,
+                      onPressed: submitSecondaryAction,
+                      child: Text(widget.secondaryActionText),
+                    ),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );
   }
 
-  void submitAction() {
+  void submitPrimaryAction() {
     if (_formKey.currentState.validate()) {
       final Transaction transaction = Transaction(
         id: widget.transaction.id,
@@ -210,8 +229,12 @@ class TransactionFormState extends State<TransactionForm> {
         dateTime: selectedDate,
       );
 
-      widget.onSuccess(transaction);
+      widget.primaryAction(transaction);
     }
+  }
+
+  void submitSecondaryAction() {
+    widget.secondaryAction(transaction);
   }
 
   _fieldFocusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
