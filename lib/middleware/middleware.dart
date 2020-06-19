@@ -7,8 +7,10 @@ import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
-ThunkAction<AppState> createTransaction({double amount, DateTime date, String description, String category}) {
-  TransactionDTO transaction = TransactionDTO(category: category, description: description, amount: amount, date: date);
+ThunkAction<AppState> createTransaction(
+    {double amount, DateTime date, String description, String category}) {
+  TransactionDTO transaction = TransactionDTO(
+      category: category, description: description, amount: amount, date: date);
   return (Store<AppState> store) async {
     return http
         .post(
@@ -34,12 +36,13 @@ ThunkAction<AppState> editTransaction(Transaction transaction) {
   return (Store<AppState> store) async {
     return http
         .post(
-      'http://zwerschke.net:2000/edit-transaction',
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(transaction),
-    );
+          'http://zwerschke.net:2000/edit-transaction',
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(transaction),
+        )
+        .then((value) => store.dispatch(fetchTransactions()));
   };
 }
 
@@ -52,9 +55,11 @@ ThunkAction<AppState> fetchTransactions() {
       },
     ).then((value) {
       Iterable list = json.decode(utf8.decode(value.bodyBytes));
-      List<Transaction> transactions = list.map((model) => Transaction.fromJson(model)).toList();
+      List<Transaction> transactions =
+          list.map((model) => Transaction.fromJson(model)).toList();
 
-      store.dispatch(AddTransactionAction.multiple(transactions: transactions, overrideExisting: true));
+      store.dispatch(AddTransactionAction.multiple(
+          transactions: transactions, overrideExisting: true));
     });
   };
 }
