@@ -30,6 +30,19 @@ ThunkAction<AppState> createTransaction({double amount, DateTime date, String de
   };
 }
 
+ThunkAction<AppState> editTransaction(Transaction transaction) {
+  return (Store<AppState> store) async {
+    return http
+        .post(
+      'http://zwerschke.net:2000/edit-transaction',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(transaction),
+    );
+  };
+}
+
 ThunkAction<AppState> fetchTransactions() {
   return (Store<AppState> store) async {
     http.get(
