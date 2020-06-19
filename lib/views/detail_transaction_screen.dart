@@ -97,9 +97,11 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    transaction.description,
-                    style: TextStyle(fontSize: 16),
+                  Flexible(
+                    child: Text(
+                      transaction.description,
+                      style: TextStyle(fontSize: 16),
+                    ),
                   ),
                 ],
               ),

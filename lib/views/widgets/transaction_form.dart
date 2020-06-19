@@ -120,6 +120,7 @@ class TransactionFormState extends State<TransactionForm> {
               controller: _amountController,
               keyboardType: TextInputType.number,
               textInputAction: TextInputAction.next,
+              maxLength: 9,
               focusNode: _amountFocus,
               onFieldSubmitted: (term) {
                 _fieldFocusChange(context, _amountFocus, _descriptionFocus);
@@ -147,6 +148,8 @@ class TransactionFormState extends State<TransactionForm> {
               controller: _descriptionController,
               textInputAction: TextInputAction.next,
               focusNode: _descriptionFocus,
+              maxLength: 255,
+              maxLines: null,
               onFieldSubmitted: (term) {
                 _fieldFocusChange(context, _descriptionFocus, _categoryFocus);
               },
@@ -168,6 +171,7 @@ class TransactionFormState extends State<TransactionForm> {
               controller: _categoryController,
               textInputAction: TextInputAction.done,
               focusNode: _categoryFocus,
+              maxLength: 255,
               onFieldSubmitted: (term) {
                 submitPrimaryAction();
               },
