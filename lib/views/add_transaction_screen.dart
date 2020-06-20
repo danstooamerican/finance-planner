@@ -24,14 +24,15 @@ class AddTransactionState extends State<AddTransactionScreen> {
     return StoreProvider<AppState>(
       store: widget.store,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text("Add Transaction"),
-        ),
-        body: TransactionForm.empty(
-          onSuccess: submitAction,
-          submitText: "Save",
-        ),
-      ),
+          appBar: AppBar(
+            title: Text("Add Transaction"),
+          ),
+          body: Padding(
+              child: TransactionForm.empty(
+                onSuccess: submitAction,
+                submitText: "Save",
+              ),
+              padding: const EdgeInsets.only(top: 16))),
     );
   }
 

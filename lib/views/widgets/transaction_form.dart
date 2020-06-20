@@ -3,6 +3,7 @@ import 'package:financeplanner/models/models.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 
 class TransactionForm extends StatefulWidget {
   final Transaction transaction;
@@ -54,6 +55,8 @@ class TransactionFormState extends State<TransactionForm> {
   TextEditingController _amountController = TextEditingController();
   TextEditingController _dateController = new TextEditingController();
   TextEditingController _categoryController = new TextEditingController();
+
+  IconData _selectedIcon = Icons.category;
 
   final FocusNode _amountFocus = FocusNode();
   final FocusNode _descriptionFocus = FocusNode();
@@ -169,24 +172,40 @@ class TransactionFormState extends State<TransactionForm> {
               padding: const EdgeInsets.all(8),
             ),
             Padding(
-              child: TextFormField(
-                controller: _categoryController,
-                textInputAction: TextInputAction.done,
-                focusNode: _categoryFocus,
-                maxLength: 32,
-                onFieldSubmitted: (term) {
-                  submitPrimaryAction();
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Category',
-                ),
-                validator: (text) {
-                  if (text == null || text.trim().isEmpty) {
-                    return 'Category is required';
-                  }
-                  return null;
-                },
+              child: Row(
+                children: [
+                  Transform.translate(
+                    offset: Offset(0, -10),
+                    child: IconButton(
+                      icon: Icon(_selectedIcon),
+                      padding: const EdgeInsets.only(right: 8),
+                      iconSize: 48,
+                      color: Colors.white,
+                      onPressed: _pickIcon,
+                    ),
+                  ),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _categoryController,
+                      textInputAction: TextInputAction.done,
+                      focusNode: _categoryFocus,
+                      maxLength: 32,
+                      onFieldSubmitted: (term) {
+                        submitPrimaryAction();
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Category',
+                      ),
+                      validator: (text) {
+                        if (text == null || text.trim().isEmpty) {
+                          return 'Category is required';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ],
               ),
               padding: const EdgeInsets.all(8),
             ),
@@ -265,6 +284,16 @@ class TransactionFormState extends State<TransactionForm> {
   void _setDate(DateTime date) {
     selectedDate = date;
     _dateController.text = date.toDateFormat();
+  }
+
+  void _pickIcon() async {
+    IconData icon = await FlutterIconPicker.showIconPicker(context, iconPackMode: IconPack.material);
+
+    if (icon != null) {
+      setState(() {
+        _selectedIcon = icon;
+      });
+    }
   }
 
   @override
