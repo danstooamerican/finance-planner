@@ -26,17 +26,19 @@ class EditTransactionState extends State<EditTransactionScreen> {
     return StoreProvider<AppState>(
       store: widget.store,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text("Edit Transaction"),
-        ),
-        body: TransactionForm.filled(
-          transaction: widget.transaction,
-          primaryAction: editTransactionAction,
-          primaryActionText: "Edit",
-          secondaryAction: deleteTransactionAction,
-          secondaryActionText: "Delete",
-        ),
-      ),
+          appBar: AppBar(
+            title: Text("Edit Transaction"),
+          ),
+          body: Padding(
+            child: TransactionForm.filled(
+              transaction: widget.transaction,
+              primaryAction: editTransactionAction,
+              primaryActionText: "Edit",
+              secondaryAction: deleteTransactionAction,
+              secondaryActionText: "Delete",
+            ),
+            padding: const EdgeInsets.only(top: 16),
+          )),
     );
   }
 
