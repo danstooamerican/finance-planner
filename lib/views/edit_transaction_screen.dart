@@ -12,7 +12,8 @@ class EditTransactionScreen extends StatefulWidget {
   final Store<AppState> store;
   final Transaction transaction;
 
-  EditTransactionScreen({Key key, this.store, this.transaction}) : super(key: key);
+  EditTransactionScreen({Key key, this.store, this.transaction})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -36,6 +37,7 @@ class EditTransactionState extends State<EditTransactionScreen> {
               primaryActionText: "Edit",
               secondaryAction: deleteTransactionAction,
               secondaryActionText: "Delete",
+              store: widget.store,
             ),
             padding: const EdgeInsets.only(top: 16),
           )),
@@ -51,7 +53,10 @@ class EditTransactionState extends State<EditTransactionScreen> {
   void deleteTransactionAction(Transaction transaction) {
     widget.store.dispatch(deleteTransaction(transaction.id));
 
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => MainScreen(store: widget.store)),
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MainScreen(store: widget.store)),
         (Route<dynamic> route) => false);
   }
 }

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:financeplanner/actions/actions.dart';
 import 'package:financeplanner/models/app_state.dart';
+import 'package:financeplanner/models/category.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
@@ -74,9 +75,30 @@ ThunkAction<AppState> fetchTransactions() {
       },
     ).then((value) {
       Iterable list = json.decode(utf8.decode(value.bodyBytes));
-      List<Transaction> transactions = list.map((model) => Transaction.fromJson(model)).toList();
+      List<Transaction> transactions =
+          list.map((model) => Transaction.fromJson(model)).toList();
 
-      store.dispatch(AddTransactionAction.multiple(transactions: transactions, overrideExisting: true));
+      store.dispatch(AddTransactionAction.multiple(
+          transactions: transactions, overrideExisting: true));
+    });
+  };
+}
+
+ThunkAction<AppState> getCategories() {
+  return (Store<AppState> store) async {
+    return new Future(() async {
+      http.get(
+        'http://zwerschke.net:2000/categories',
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      ).then((value) {
+        Iterable list = json.decode(utf8.decode(value.bodyBytes));
+        List<Category> categories =
+            list.map((model) => Category.fromJson(model)).toList();
+
+        store.dispatch(UpdateCategoriesAction(categories));
+      });
     });
   };
 }

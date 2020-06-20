@@ -1,3 +1,4 @@
+import 'package:financeplanner/models/category.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:meta/meta.dart';
 
@@ -5,5 +6,7 @@ import 'package:meta/meta.dart';
 class AppState {
   final List<Transaction> transactions;
 
-  AppState({@required this.transactions});
+  AppState({
+    @required this.transactions,
+  });
 }

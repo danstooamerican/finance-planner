@@ -1,10 +1,11 @@
+import 'package:financeplanner/models/category.dart';
 import 'package:flutter/cupertino.dart';
 
 class Transaction {
   final int id;
   final DateTime dateTime;
   final String description;
-  final String category;
+  final Category category;
   final double amount;
 
   Transaction({
@@ -22,16 +23,23 @@ class Transaction {
   Transaction.fromJson(Map<String, dynamic> json)
       : amount = json['amount'],
         id = json['id'],
-        category = json['category'],
+        category = Category.fromJson(json['category']),
         dateTime = DateTime.parse(json['date']),
         description = json['description'];
 
   Map<String, dynamic> toJson() {
+    print({
+      'id': id,
+      'amount': amount,
+      'description': description,
+      'category': category.toJson(),
+      'date': date.toString().substring(0, 10),
+    });
     return {
       'id': id,
       'amount': amount,
       'description': description,
-      'category': category,
+      'category': category.toJson(),
       'date': date.toString().substring(0, 10),
     };
   }

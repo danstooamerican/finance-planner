@@ -10,9 +10,11 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'views/main_screen.dart';
 
 void main() {
-  final store =
-      Store<AppState>(appReducer, initialState: AppState(transactions: new List()), middleware: [thunkMiddleware]);
+  final store = Store<AppState>(appReducer,
+      initialState: AppState(transactions: new List()),
+      middleware: [thunkMiddleware]);
 
+  store.dispatch(getCategories());
   store.dispatch(fetchTransactions());
 
   runApp(MaterialApp(

@@ -1,12 +1,21 @@
+import 'dart:convert';
+
 import 'package:financeplanner/extensions/extensions.dart';
+import 'package:financeplanner/middleware/middleware.dart';
+import 'package:financeplanner/models/category.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
+import 'package:redux/redux.dart';
+import 'package:financeplanner/actions/actions.dart';
+import 'package:financeplanner/models/app_state.dart';
+import 'package:http/http.dart' as http;
 
 class TransactionForm extends StatefulWidget {
   final Transaction transaction;
+  final Store<AppState> store;
 
   final String primaryActionText;
   final String secondaryActionText;
@@ -16,7 +25,11 @@ class TransactionForm extends StatefulWidget {
   //// No form checks are performed before this action is called.
   final Function(Transaction) secondaryAction;
 
-  factory TransactionForm.empty({Key key, Function(Transaction) onSuccess, String submitText = "Save"}) {
+  factory TransactionForm.empty(
+      {Key key,
+      Store store,
+      Function(Transaction) onSuccess,
+      String submitText = "Save"}) {
     Transaction transaction = new Transaction(
       id: 0, // keep 0 as default id so the backend can recognize it as new
       category: null,
@@ -27,6 +40,7 @@ class TransactionForm extends StatefulWidget {
 
     return TransactionForm.filled(
       key: key,
+      store: store,
       transaction: transaction,
       primaryAction: onSuccess,
       primaryActionText: submitText,
@@ -35,12 +49,15 @@ class TransactionForm extends StatefulWidget {
 
   TransactionForm.filled({
     Key key,
+    @required this.store,
     @required this.transaction,
     @required this.primaryAction,
     this.secondaryAction,
     this.primaryActionText = "Save",
     this.secondaryActionText = "Delete",
-  }) : super(key: key);
+  }) : super(key: key) {
+    store.dispatch(getCategories());
+  }
 
   @override
   State<StatefulWidget> createState() {
@@ -54,7 +71,8 @@ class TransactionFormState extends State<TransactionForm> {
   TextEditingController _descriptionController = new TextEditingController();
   TextEditingController _amountController = TextEditingController();
   TextEditingController _dateController = new TextEditingController();
-  TextEditingController _categoryController = new TextEditingController();
+  Category _selectedCategory;
+  List<Category> _categories = List();
 
   IconData _selectedIcon = Icons.category;
 
@@ -66,7 +84,8 @@ class TransactionFormState extends State<TransactionForm> {
 
   final _formKey = GlobalKey<FormState>();
 
-  final _prefixMoneyRegex = new RegExp(r'^-?(([1-9][0-9]*|0)(\,|\.)?)?([0-9]{1,2})?$');
+  final _prefixMoneyRegex =
+      new RegExp(r'^-?(([1-9][0-9]*|0)(\,|\.)?)?([0-9]{1,2})?$');
   String previousAmountText;
   TextSelection previousAmountSelection;
 
@@ -74,8 +93,10 @@ class TransactionFormState extends State<TransactionForm> {
     _amountController.addListener(() {
       final String currentValue = _amountController.text;
 
-      if (currentValue.length > 0 && _prefixMoneyRegex.matchAsPrefix(currentValue) == null) {
-        _amountController.value = TextEditingValue(text: previousAmountText, selection: previousAmountSelection);
+      if (currentValue.length > 0 &&
+          _prefixMoneyRegex.matchAsPrefix(currentValue) == null) {
+        _amountController.value = TextEditingValue(
+            text: previousAmountText, selection: previousAmountSelection);
       } else {
         previousAmountText = currentValue;
         previousAmountSelection = _amountController.selection;
@@ -88,7 +109,26 @@ class TransactionFormState extends State<TransactionForm> {
     _setDate(transaction.date);
     _amountController.text = transaction.amount?.formatMoneyToEdit();
     _descriptionController.text = transaction.description;
-    _categoryController.text = transaction.category;
+
+    getCategories().then((value) => setState(() {
+          if (transaction.category != null) {
+            _selectedCategory = transaction.category;
+          } else {
+            _selectedCategory = _categories.first;
+          }
+        }));
+  }
+
+  Future<void> getCategories() async {
+    await http.get(
+      'http://zwerschke.net:2000/categories',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    ).then((value) {
+      Iterable list = json.decode(utf8.decode(value.bodyBytes));
+      _categories = list.map((model) => Category.fromJson(model)).toList();
+    });
   }
 
   @override
@@ -185,26 +225,21 @@ class TransactionFormState extends State<TransactionForm> {
                     ),
                   ),
                   Expanded(
-                    child: TextFormField(
-                      controller: _categoryController,
-                      textInputAction: TextInputAction.done,
-                      focusNode: _categoryFocus,
-                      maxLength: 32,
-                      onFieldSubmitted: (term) {
-                        submitPrimaryAction();
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Category',
-                      ),
-                      validator: (text) {
-                        if (text == null || text.trim().isEmpty) {
-                          return 'Category is required';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
+                      child: DropdownButton<Category>(
+                    value: _selectedCategory,
+                    onChanged: (Category newValue) {
+                      setState(() {
+                        _selectedCategory = newValue;
+                      });
+                    },
+                    items: _categories
+                        .map<DropdownMenuItem<Category>>((Category category) {
+                      return DropdownMenuItem<Category>(
+                        value: category,
+                        child: Text(category.name),
+                      );
+                    }).toList(),
+                  )),
                 ],
               ),
               padding: const EdgeInsets.all(8),
@@ -249,7 +284,7 @@ class TransactionFormState extends State<TransactionForm> {
     if (_formKey.currentState.validate()) {
       final Transaction transaction = Transaction(
         id: widget.transaction.id,
-        category: _categoryController.text.trim(),
+        category: _selectedCategory,
         description: _descriptionController.text.trim(),
         amount: _amountController.text.parseMoney(),
         dateTime: selectedDate,
@@ -263,14 +298,18 @@ class TransactionFormState extends State<TransactionForm> {
     widget.secondaryAction(transaction);
   }
 
-  _fieldFocusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
+  _fieldFocusChange(
+      BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
     currentFocus.unfocus();
     FocusScope.of(context).requestFocus(nextFocus);
   }
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
-        context: context, initialDate: selectedDate, firstDate: DateTime(1900), lastDate: DateTime(2200));
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(1900),
+        lastDate: DateTime(2200));
 
     if (picked != null && picked != selectedDate) {
       setState(() {
@@ -287,7 +326,8 @@ class TransactionFormState extends State<TransactionForm> {
   }
 
   void _pickIcon() async {
-    IconData icon = await FlutterIconPicker.showIconPicker(context, iconPackMode: IconPack.material);
+    IconData icon = await FlutterIconPicker.showIconPicker(context,
+        iconPackMode: IconPack.material);
 
     if (icon != null) {
       setState(() {
@@ -301,7 +341,6 @@ class TransactionFormState extends State<TransactionForm> {
     _amountController.dispose();
     _dateController.dispose();
     _descriptionController.dispose();
-    _categoryController.dispose();
     super.dispose();
   }
 }
