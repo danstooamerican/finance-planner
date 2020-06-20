@@ -40,20 +40,27 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 32, 8, 8),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: Icon(Icons.category),
                   ),
-                  Text(
-                    transaction.category,
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  Spacer(),
+                  Expanded(
+                      child: Padding(
+                    child: AutoSizeText(
+                      transaction.category,
+                      minFontSize: 14,
+                      maxLines: 2,
+                      wrapWords: true,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    padding: const EdgeInsets.only(right: 64),
+                  )),
                   Text(
                     transaction.date.toDateFormat(),
                     style: TextStyle(fontSize: 18),
+                    textAlign: TextAlign.right,
                   ),
                 ],
               ),
