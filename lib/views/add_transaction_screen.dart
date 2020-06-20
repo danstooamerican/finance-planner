@@ -31,6 +31,7 @@ class AddTransactionState extends State<AddTransactionScreen> {
               child: TransactionForm.empty(
                 onSuccess: submitAction,
                 submitText: "Save",
+                store: widget.store,
               ),
               padding: const EdgeInsets.only(top: 16))),
     );

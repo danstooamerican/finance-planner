@@ -49,7 +49,7 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
                   Expanded(
                       child: Padding(
                     child: AutoSizeText(
-                      transaction.category,
+                      transaction.category.name,
                       minFontSize: 14,
                       maxLines: 2,
                       wrapWords: true,
