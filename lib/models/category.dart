@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:financeplanner/extensions/extensions.dart';
+import 'package:flutter/cupertino.dart';
 
 class Category {
   final int id;
@@ -18,11 +18,7 @@ class Category {
         icon = _iconFromJson(json['icon']);
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'icon': icon.toJson()
-    };
+    return {'id': id, 'name': name, 'icon': icon.toJson()};
   }
 
   static IconData _iconFromJson(Map<String, dynamic> json) {
@@ -32,4 +28,7 @@ class Category {
 
     return IconData(codePoint, fontFamily: fontFamily, fontPackage: fontPackage);
   }
+
+  bool operator ==(o) => o is Category && id == o.id;
+  int get hashCode => id.hashCode;
 }
