@@ -2,16 +2,15 @@ import 'dart:convert';
 
 import 'package:financeplanner/extensions/extensions.dart';
 import 'package:financeplanner/middleware/middleware.dart';
+import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/category.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
-import 'package:redux/redux.dart';
-import 'package:financeplanner/actions/actions.dart';
-import 'package:financeplanner/models/app_state.dart';
 import 'package:http/http.dart' as http;
+import 'package:redux/redux.dart';
 
 class TransactionForm extends StatefulWidget {
   final Transaction transaction;
@@ -25,11 +24,7 @@ class TransactionForm extends StatefulWidget {
   //// No form checks are performed before this action is called.
   final Function(Transaction) secondaryAction;
 
-  factory TransactionForm.empty(
-      {Key key,
-      Store store,
-      Function(Transaction) onSuccess,
-      String submitText = "Save"}) {
+  factory TransactionForm.empty({Key key, Store store, Function(Transaction) onSuccess, String submitText = "Save"}) {
     Transaction transaction = new Transaction(
       id: 0, // keep 0 as default id so the backend can recognize it as new
       category: null,
@@ -84,8 +79,7 @@ class TransactionFormState extends State<TransactionForm> {
 
   final _formKey = GlobalKey<FormState>();
 
-  final _prefixMoneyRegex =
-      new RegExp(r'^-?(([1-9][0-9]*|0)(\,|\.)?)?([0-9]{1,2})?$');
+  final _prefixMoneyRegex = new RegExp(r'^-?(([1-9][0-9]*|0)(\,|\.)?)?([0-9]{1,2})?$');
   String previousAmountText;
   TextSelection previousAmountSelection;
 
@@ -93,10 +87,8 @@ class TransactionFormState extends State<TransactionForm> {
     _amountController.addListener(() {
       final String currentValue = _amountController.text;
 
-      if (currentValue.length > 0 &&
-          _prefixMoneyRegex.matchAsPrefix(currentValue) == null) {
-        _amountController.value = TextEditingValue(
-            text: previousAmountText, selection: previousAmountSelection);
+      if (currentValue.length > 0 && _prefixMoneyRegex.matchAsPrefix(currentValue) == null) {
+        _amountController.value = TextEditingValue(text: previousAmountText, selection: previousAmountSelection);
       } else {
         previousAmountText = currentValue;
         previousAmountSelection = _amountController.selection;
@@ -113,7 +105,7 @@ class TransactionFormState extends State<TransactionForm> {
     getCategories().then((value) => setState(() {
           if (transaction.category != null) {
             _selectedCategory = transaction.category;
-          } else {
+          } else if (_categories.isNotEmpty) {
             _selectedCategory = _categories.first;
           }
         }));
@@ -214,32 +206,34 @@ class TransactionFormState extends State<TransactionForm> {
             Padding(
               child: Row(
                 children: [
-                  Transform.translate(
-                    offset: Offset(0, -10),
-                    child: IconButton(
-                      icon: Icon(_selectedIcon),
-                      padding: const EdgeInsets.only(right: 8),
-                      iconSize: 48,
-                      color: Colors.white,
-                      onPressed: _pickIcon,
-                    ),
+                  IconButton(
+                    icon: Icon(_selectedIcon),
+                    padding: const EdgeInsets.only(right: 8),
+                    iconSize: 48,
+                    color: Colors.white,
+                    onPressed: _pickIcon,
                   ),
                   Expanded(
+                    child: ButtonTheme(
                       child: DropdownButton<Category>(
-                    value: _selectedCategory,
-                    onChanged: (Category newValue) {
-                      setState(() {
-                        _selectedCategory = newValue;
-                      });
-                    },
-                    items: _categories
-                        .map<DropdownMenuItem<Category>>((Category category) {
-                      return DropdownMenuItem<Category>(
-                        value: category,
-                        child: Text(category.name),
-                      );
-                    }).toList(),
-                  )),
+                        hint: Text("Select or add category"),
+                        isExpanded: true,
+                        value: _selectedCategory,
+                        onChanged: (Category newValue) {
+                          setState(() {
+                            _selectedCategory = newValue;
+                          });
+                        },
+                        items: _categories.map<DropdownMenuItem<Category>>((Category category) {
+                          return DropdownMenuItem<Category>(
+                            value: category,
+                            child: Text(category.name),
+                          );
+                        }).toList(),
+                      ),
+                      alignedDropdown: true,
+                    ),
+                  ),
                 ],
               ),
               padding: const EdgeInsets.all(8),
@@ -298,18 +292,14 @@ class TransactionFormState extends State<TransactionForm> {
     widget.secondaryAction(transaction);
   }
 
-  _fieldFocusChange(
-      BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
+  _fieldFocusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
     currentFocus.unfocus();
     FocusScope.of(context).requestFocus(nextFocus);
   }
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(1900),
-        lastDate: DateTime(2200));
+        context: context, initialDate: selectedDate, firstDate: DateTime(1900), lastDate: DateTime(2200));
 
     if (picked != null && picked != selectedDate) {
       setState(() {
@@ -326,8 +316,7 @@ class TransactionFormState extends State<TransactionForm> {
   }
 
   void _pickIcon() async {
-    IconData icon = await FlutterIconPicker.showIconPicker(context,
-        iconPackMode: IconPack.material);
+    IconData icon = await FlutterIconPicker.showIconPicker(context, iconPackMode: IconPack.material);
 
     if (icon != null) {
       setState(() {
