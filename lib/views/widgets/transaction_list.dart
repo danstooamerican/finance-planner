@@ -167,7 +167,7 @@ class _TransactionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(
-        Icons.card_giftcard,
+        transaction.category.icon,
         color: Colors.white,
         size: 30.0,
       ),

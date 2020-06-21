@@ -44,7 +44,7 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
-                    child: Icon(Icons.category),
+                    child: Icon(transaction.category.icon),
                   ),
                   Expanded(
                       child: Padding(
