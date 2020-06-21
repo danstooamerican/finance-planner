@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 
@@ -66,18 +67,20 @@ class TransactionFormState extends State<TransactionForm> {
   TextEditingController _descriptionController = new TextEditingController();
   TextEditingController _amountController = TextEditingController();
   TextEditingController _dateController = new TextEditingController();
+  TextEditingController _categoryController = new TextEditingController();
+
   Category _selectedCategory;
   List<Category> _categories = List();
-
   IconData _selectedIcon = Icons.category;
 
   final FocusNode _amountFocus = FocusNode();
   final FocusNode _descriptionFocus = FocusNode();
   final FocusNode _categoryFocus = FocusNode();
   final FocusNode _dateFocus = FocusNode();
+
   final Transaction transaction;
 
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey();
 
   final _prefixMoneyRegex = new RegExp(r'^-?(([1-9][0-9]*|0)(\,|\.)?)?([0-9]{1,2})?$');
   String previousAmountText;
@@ -102,13 +105,15 @@ class TransactionFormState extends State<TransactionForm> {
     _amountController.text = transaction.amount?.formatMoneyToEdit();
     _descriptionController.text = transaction.description;
 
-    getCategories().then((value) => setState(() {
-          if (transaction.category != null) {
-            _selectedCategory = transaction.category;
-          } else if (_categories.isNotEmpty) {
-            _selectedCategory = _categories.first;
-          }
-        }));
+    getCategories().then((value) {
+      setState(() {
+        if (transaction.category != null) {
+          _selectCategory(transaction.category);
+        } else if (_categories.isNotEmpty) {
+          _selectCategory(_categories.first);
+        }
+      });
+    });
   }
 
   Future<void> getCategories() async {
@@ -119,7 +124,9 @@ class TransactionFormState extends State<TransactionForm> {
       },
     ).then((value) {
       Iterable list = json.decode(utf8.decode(value.bodyBytes));
-      _categories = list.map((model) => Category.fromJson(model)).toList();
+      setState(() {
+        _categories = list.map((model) => Category.fromJson(model)).toList();
+      });
     });
   }
 
@@ -131,6 +138,58 @@ class TransactionFormState extends State<TransactionForm> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Padding(
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(_selectedIcon),
+                    padding: const EdgeInsets.only(right: 8),
+                    iconSize: 48,
+                    color: Colors.white,
+                    onPressed: _pickIcon,
+                  ),
+                  Expanded(
+                    child: TypeAheadFormField(
+                      textFieldConfiguration: TextFieldConfiguration(
+                        controller: _categoryController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'Category',
+                        ),
+                      ),
+                      itemBuilder: (context, suggestion) => ListTile(
+                        title: Text(suggestion.name),
+                        leading: Icon(suggestion.icon),
+                      ),
+                      suggestionsCallback: (pattern) {
+                        List<Category> suggestions = List.from(_categories);
+                        suggestions
+                            .retainWhere((element) => element.name.toLowerCase().startsWith(pattern.toLowerCase()));
+
+                        return suggestions;
+                      },
+                      onSuggestionSelected: (suggestion) {
+                        setState(() {
+                          _selectCategory(suggestion);
+                        });
+                      },
+                      transitionBuilder: (context, suggestionsBox, controller) {
+                        return suggestionsBox;
+                      },
+                      getImmediateSuggestions: true,
+                      loadingBuilder: (context) => null,
+                      validator: (text) {
+                        if (text == null || text.trim().isEmpty) {
+                          return 'Category is required';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(8),
+            ),
             Padding(
               child: TextFormField(
                 controller: _dateController,
@@ -203,41 +262,6 @@ class TransactionFormState extends State<TransactionForm> {
               ),
               padding: const EdgeInsets.all(8),
             ),
-            Padding(
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(_selectedIcon),
-                    padding: const EdgeInsets.only(right: 8),
-                    iconSize: 48,
-                    color: Colors.white,
-                    onPressed: _pickIcon,
-                  ),
-                  Expanded(
-                    child: ButtonTheme(
-                      child: DropdownButton<Category>(
-                        hint: Text("Select or add category"),
-                        isExpanded: true,
-                        value: _selectedCategory,
-                        onChanged: (Category newValue) {
-                          setState(() {
-                            _selectedCategory = newValue;
-                          });
-                        },
-                        items: _categories.map<DropdownMenuItem<Category>>((Category category) {
-                          return DropdownMenuItem<Category>(
-                            value: category,
-                            child: Text(category.name),
-                          );
-                        }).toList(),
-                      ),
-                      alignedDropdown: true,
-                    ),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(8),
-            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -275,10 +299,19 @@ class TransactionFormState extends State<TransactionForm> {
   }
 
   void submitPrimaryAction() {
-    if (_formKey.currentState.validate()) {
+    if (_formKey.currentState.validate() &&
+        _categoryController.text != null &&
+        _categoryController.text.trim().isNotEmpty) {
+      int categoryId = 0;
+      if (_selectedCategory != null && _categoryController.text == _selectedCategory.name) {
+        categoryId = _selectedCategory.id;
+      }
+
+      Category category = Category(id: categoryId, name: _categoryController.text, icon: _selectedIcon);
+
       final Transaction transaction = Transaction(
         id: widget.transaction.id,
-        category: _selectedCategory,
+        category: category,
         description: _descriptionController.text.trim(),
         amount: _amountController.text.parseMoney(),
         dateTime: selectedDate,
@@ -321,7 +354,19 @@ class TransactionFormState extends State<TransactionForm> {
     if (icon != null) {
       setState(() {
         _selectedIcon = icon;
+
+        if (_selectedCategory != null) {
+          _selectCategory(Category(id: _selectedCategory.id, name: _selectedCategory.name, icon: icon));
+        }
       });
+    }
+  }
+
+  void _selectCategory(Category category) {
+    if (category != null) {
+      _selectedCategory = category;
+      _categoryController.text = category.name;
+      _selectedIcon = category.icon;
     }
   }
 

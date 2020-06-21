@@ -28,13 +28,6 @@ class Transaction {
         description = json['description'];
 
   Map<String, dynamic> toJson() {
-    print({
-      'id': id,
-      'amount': amount,
-      'description': description,
-      'category': category.toJson(),
-      'date': date.toString().substring(0, 10),
-    });
     return {
       'id': id,
       'amount': amount,

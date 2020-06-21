@@ -20,15 +20,7 @@ ThunkAction<AppState> createTransaction({Transaction transaction}) {
     )
         .then(
       (value) {
-        store.dispatch(
-          AddTransactionAction.single(
-            id: int.parse(value.body),
-            date: transaction.date,
-            description: transaction.description,
-            amount: transaction.amount,
-            category: transaction.category,
-          ),
-        );
+        store.dispatch(fetchTransactions());
       },
     );
   };
@@ -75,11 +67,9 @@ ThunkAction<AppState> fetchTransactions() {
       },
     ).then((value) {
       Iterable list = json.decode(utf8.decode(value.bodyBytes));
-      List<Transaction> transactions =
-          list.map((model) => Transaction.fromJson(model)).toList();
+      List<Transaction> transactions = list.map((model) => Transaction.fromJson(model)).toList();
 
-      store.dispatch(AddTransactionAction.multiple(
-          transactions: transactions, overrideExisting: true));
+      store.dispatch(AddTransactionAction.multiple(transactions: transactions, overrideExisting: true));
     });
   };
 }
@@ -94,8 +84,7 @@ ThunkAction<AppState> getCategories() {
         },
       ).then((value) {
         Iterable list = json.decode(utf8.decode(value.bodyBytes));
-        List<Category> categories =
-            list.map((model) => Category.fromJson(model)).toList();
+        List<Category> categories = list.map((model) => Category.fromJson(model)).toList();
 
         store.dispatch(UpdateCategoriesAction(categories));
       });
