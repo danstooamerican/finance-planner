@@ -1,0 +1,19 @@
+{
+  "overview": "Übersicht",
+  "balance": "Bilanz",
+  "category": "Kategorie",
+  "category-required": "Kategorie benötigt",
+  "date": "Datum",
+  "date-required": "Datum benötigt",
+  "amount": "Betrag",
+  "amount-required": "Betrag benötigt",
+  "amount-invalid": "Betrag ungültig",
+  "add-transaction": "Buchung hinzufügen",
+  "edit-transaction": "Buchung bearbeiten",
+  "details": "Details",
+  "description": "Beschreibung",
+  "edit": "Bearbeiten",
+  "delete": "Löschen",
+  "save": "Speichern",
+  "description-required": "Beschreibung benötigt"
+}

@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 
+import '../../app_localizations.dart';
 import '../detail_transaction_screen.dart';
 
 class TransactionList extends StatelessWidget {
@@ -36,14 +37,14 @@ class TransactionList extends StatelessWidget {
             flexibleSpace: FlexibleSpaceBar(
               title: Transform.translate(
                 offset: const Offset(-40, 0),
-                child: Text('Overview'),
+                child: Text(AppLocalizations.of(context).translate('overview')),
               ),
               background: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     AutoSizeText(
-                      "Balance",
+                      AppLocalizations.of(context).translate('balance'),
                       style: TextStyle(color: Colors.grey),
                       textAlign: TextAlign.left,
                       minFontSize: 30,
@@ -76,7 +77,8 @@ class TransactionList extends StatelessWidget {
   }
 
   double _getBalance(List<Transaction> transaction) {
-    return transaction.fold(0, (previousValue, Transaction element) => previousValue + element.amount);
+    return transaction.fold(0,
+        (previousValue, Transaction element) => previousValue + element.amount);
   }
 }
 
@@ -100,7 +102,8 @@ class _TransactionListItem extends StatelessWidget {
     }
   }
 
-  bool _isOnDifferentDayToPredecessor(List<Transaction> transactions, int currentIndex, int previousIndex) {
+  bool _isOnDifferentDayToPredecessor(
+      List<Transaction> transactions, int currentIndex, int previousIndex) {
     if (currentIndex == 0) {
       return true;
     }
@@ -133,8 +136,9 @@ class _DividerTransactionItem extends StatelessWidget {
         children: [
           Padding(
             child: Text(
-              _getDate(transaction.date),
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              _getDate(context, transaction.date),
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
             ),
             padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),
           ),
@@ -154,10 +158,10 @@ class _DividerTransactionItem extends StatelessWidget {
     );
   }
 
-  String _getDate(DateTime date) {
+  String _getDate(BuildContext context, DateTime date) {
     DateTime now = DateTime.now();
     if (date.isAtSameMomentAs(new DateTime(now.year, now.month, now.day))) {
-      return "Today";
+      return AppLocalizations.of(context).translate('add-transaction');
     }
 
     return date.toDateFormat();
@@ -188,7 +192,9 @@ class _TransactionItem extends StatelessWidget {
       ),
       trailing: AutoSizeText(
         transaction.amount.toMoneyFormatWithSign(),
-        style: TextStyle(fontWeight: FontWeight.bold, color: transaction.amount.toMoneyColor()),
+        style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: transaction.amount.toMoneyColor()),
         textAlign: TextAlign.right,
         minFontSize: 8,
         maxLines: 1,

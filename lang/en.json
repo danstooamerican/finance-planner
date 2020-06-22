@@ -1,0 +1,18 @@
+{
+  "overview": "Overview",
+  "balance": "Balance",
+  "category": "Category",
+  "category-required": "Category required",
+  "date": "Date",
+  "date-required": "Date required",
+  "amount": "Amount",
+  "amount-required": "Amount required",
+  "add-transaction": "Add transaction",
+  "edit-transaction": "Edit transaction",
+  "details": "Details",
+  "description": "Description",
+  "edit": "Edit",
+  "delete": "Delete",
+  "save": "Save",
+  "description-required": "Description required"
+}
