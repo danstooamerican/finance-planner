@@ -1,3 +1,4 @@
+import 'package:financeplanner/app_localizations.dart';
 import 'package:financeplanner/middleware/middleware.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
@@ -20,7 +21,8 @@ class MainScreen extends StatefulWidget {
   }
 }
 
-class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
+class MainScreenState extends State<MainScreen>
+    with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   Animation<Offset> _offsetAnimation;
   ScrollController _scrollController = ScrollController();
@@ -45,13 +47,15 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
 
   MainScreenState() {
     _scrollController.addListener(() {
-      if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+      if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
         if (_fabIsVisible == true && !_animationController.isAnimating) {
           _animationController.forward();
           _fabIsVisible = false;
         }
       } else {
-        if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
+        if (_scrollController.position.userScrollDirection ==
+            ScrollDirection.forward) {
           if (_fabIsVisible == false && !_animationController.isAnimating) {
             _animationController.reverse();
             _fabIsVisible = true;
@@ -97,10 +101,13 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddTransactionScreen(store: widget.store)),
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          AddTransactionScreen(store: widget.store)),
                 );
               },
-              tooltip: 'Add Transaction',
+              tooltip:
+                  AppLocalizations.of(context).translate('add-transaction'),
               child: Icon(Icons.add),
             ),
           ),

@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
+import '../app_localizations.dart';
+
 class AddTransactionScreen extends StatefulWidget {
   final Store<AppState> store;
 
@@ -25,12 +27,13 @@ class AddTransactionState extends State<AddTransactionScreen> {
       store: widget.store,
       child: Scaffold(
           appBar: AppBar(
-            title: Text("Add Transaction"),
+            title:
+                Text(AppLocalizations.of(context).translate('add-transaction')),
           ),
           body: Padding(
               child: TransactionForm.empty(
-                onSuccess: submitAction,
-                submitText: "Save",
+                primaryAction: submitAction,
+                primaryText: AppLocalizations.of(context).translate('save'),
                 store: widget.store,
               ),
               padding: const EdgeInsets.only(top: 16))),
