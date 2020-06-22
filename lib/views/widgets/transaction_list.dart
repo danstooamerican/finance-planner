@@ -12,8 +12,14 @@ class TransactionList extends StatelessWidget {
   final Store<AppState> store;
   final List<Transaction> transactions;
   final VoidCallback onRefresh;
+  final ScrollController scrollController;
 
-  TransactionList({this.store, this.transactions, this.onRefresh});
+  TransactionList({
+    @required this.store,
+    @required this.transactions,
+    this.onRefresh,
+    this.scrollController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +27,7 @@ class TransactionList extends StatelessWidget {
 
     return RefreshIndicator(
       child: CustomScrollView(
+        controller: scrollController,
         semanticChildCount: transactions.length,
         slivers: <Widget>[
           SliverAppBar(
