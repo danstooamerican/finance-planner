@@ -8,11 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
+import '../app_localizations.dart';
+
 class EditTransactionScreen extends StatefulWidget {
   final Store<AppState> store;
   final Transaction transaction;
 
-  EditTransactionScreen({Key key, this.store, this.transaction}) : super(key: key);
+  EditTransactionScreen({Key key, this.store, this.transaction})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -27,15 +30,17 @@ class EditTransactionState extends State<EditTransactionScreen> {
       store: widget.store,
       child: Scaffold(
           appBar: AppBar(
-            title: Text("Edit Transaction"),
+            title: Text(
+                AppLocalizations.of(context).translate('edit-transaction')),
           ),
           body: Padding(
             child: TransactionForm.filled(
               transaction: widget.transaction,
               primaryAction: editTransactionAction,
-              primaryActionText: "Edit",
+              primaryActionText: AppLocalizations.of(context).translate('edit'),
               secondaryAction: deleteTransactionAction,
-              secondaryActionText: "Delete",
+              secondaryActionText:
+                  AppLocalizations.of(context).translate('delete'),
               store: widget.store,
             ),
             padding: const EdgeInsets.only(top: 16),
@@ -52,7 +57,10 @@ class EditTransactionState extends State<EditTransactionScreen> {
   void deleteTransactionAction(Transaction transaction) {
     widget.store.dispatch(deleteTransaction(transaction.id));
 
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => MainScreen(store: widget.store)),
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MainScreen(store: widget.store)),
         (Route<dynamic> route) => false);
   }
 }

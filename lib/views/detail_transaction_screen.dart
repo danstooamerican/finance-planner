@@ -7,13 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
+import '../app_localizations.dart';
 import 'edit_transaction_screen.dart';
 
 class DetailTransactionScreen extends StatefulWidget {
   final Store<AppState> store;
   final Transaction transaction;
 
-  DetailTransactionScreen({Key key, this.store, this.transaction}) : super(key: key);
+  DetailTransactionScreen({Key key, this.store, this.transaction})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -32,7 +34,7 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
       store: widget.store,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Details"),
+          title: Text(AppLocalizations.of(context).translate('details')),
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -77,7 +79,8 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
                       decoration: BoxDecoration(color: const Color(0xff3b3f42)),
                       child: AutoSizeText(
                         transaction.amount.toMoneyFormatWithSign(),
-                        style: TextStyle(color: transaction.amount.toMoneyColor()),
+                        style:
+                            TextStyle(color: transaction.amount.toMoneyColor()),
                         textAlign: TextAlign.center,
                         minFontSize: 30,
                         overflow: TextOverflow.ellipsis,
@@ -93,7 +96,7 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    "Description:",
+                    AppLocalizations.of(context).translate('description'),
                     style: TextStyle(fontSize: 18, color: Colors.grey),
                   ),
                 ],
@@ -133,7 +136,7 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
               });
             }
           },
-          tooltip: 'Edit Transaction',
+          tooltip: AppLocalizations.of(context).translate('edit-transaction'),
           child: Icon(Icons.edit),
         )),
       ),
