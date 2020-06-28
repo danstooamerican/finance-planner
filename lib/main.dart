@@ -4,6 +4,7 @@ import 'package:financeplanner/models/models.dart';
 import 'package:financeplanner/reducers/app_reducer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -11,14 +12,16 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'app_localizations.dart';
 import 'views/main_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GlobalConfiguration().loadFromAsset("app_settings");
+
   final store = Store<AppState>(appReducer,
       initialState: AppState(transactions: new List()),
       middleware: [thunkMiddleware]);
 
   store.dispatch(getCategories());
   store.dispatch(fetchTransactions());
-
   runApp(MaterialApp(
       title: 'Finance App',
       theme: ThemeData.dark(),
