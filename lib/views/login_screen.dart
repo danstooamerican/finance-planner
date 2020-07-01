@@ -10,6 +10,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:redux/redux.dart';
 
+import '../app_localizations.dart';
+
 class LoginScreen extends StatelessWidget {
   final Store<AppState> store;
 
@@ -21,7 +23,7 @@ class LoginScreen extends StatelessWidget {
       store: store,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Login"),
+          title: Text(AppLocalizations.of(context).translate('login')),
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -37,7 +39,7 @@ class LoginScreen extends StatelessWidget {
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 32, vertical: 4),
                       title: Text(
-                        "Login with Google",
+                        AppLocalizations.of(context).translate('login-google'),
                         style: TextStyle(
                           fontSize: 18,
                         ),
@@ -60,7 +62,7 @@ class LoginScreen extends StatelessWidget {
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 32, vertical: 4),
                       title: Text(
-                        "Login with Facebook",
+                        AppLocalizations.of(context).translate('login-facebook'),
                         style: TextStyle(
                           fontSize: 18,
                         ),

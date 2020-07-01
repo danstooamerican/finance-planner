@@ -168,7 +168,7 @@ class _DividerTransactionItem extends StatelessWidget {
   String _getDate(BuildContext context, DateTime date) {
     DateTime now = DateTime.now();
     if (date.isAtSameMomentAs(new DateTime(now.year, now.month, now.day))) {
-      return AppLocalizations.of(context).translate('add-transaction');
+      return AppLocalizations.of(context).translate('today');
     }
 
     return date.toDateFormat();

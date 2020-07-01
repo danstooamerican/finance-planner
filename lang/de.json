@@ -3,6 +3,7 @@
   "balance": "Bilanz",
   "category": "Kategorie",
   "category-required": "Kategorie benötigt",
+  "today": "Heute",
   "date": "Datum",
   "date-required": "Datum benötigt",
   "amount": "Betrag",
@@ -15,5 +16,8 @@
   "edit": "Bearbeiten",
   "delete": "Löschen",
   "save": "Speichern",
-  "description-required": "Beschreibung benötigt"
+  "description-required": "Beschreibung benötigt",
+  "login": "Anmelden",
+  "login-google": "Mit Google anmelden",
+  "login-facebook": "Mit Facebook anmelden"
 }
