@@ -17,8 +17,8 @@ extension StringFormatting on String {
 
     int sign = 1;
     String toFormat = sanitizeMoneyString(this);
-    if (this.startsWith("-")) {
-      toFormat = this.substring(1);
+    if (toFormat.startsWith("-")) {
+      toFormat = toFormat.substring(1);
       sign = -1;
     }
 
