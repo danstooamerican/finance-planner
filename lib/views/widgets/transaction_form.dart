@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 
 import '../../app_localizations.dart';
@@ -61,9 +60,7 @@ class TransactionForm extends StatefulWidget {
     this.secondaryAction,
     @required this.primaryActionText,
     @required this.secondaryActionText,
-  }) : super(key: key) {
-    store.dispatch(getCategories());
-  }
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -92,8 +89,7 @@ class TransactionFormState extends State<TransactionForm> {
 
   final GlobalKey<FormState> _formKey = GlobalKey();
 
-  final _prefixMoneyRegex =
-      new RegExp(r'^-?(([1-9][0-9]*|0)(\,|\.)?)?([0-9]{1,2})?$');
+  final _prefixMoneyRegex = new RegExp(r'^-?(([1-9][0-9]*|0)(\,|\.)?)?([0-9]{1,2})?$');
   String previousAmountText;
   TextSelection previousAmountSelection;
 
@@ -101,10 +97,8 @@ class TransactionFormState extends State<TransactionForm> {
     _amountController.addListener(() {
       final String currentValue = _amountController.text;
 
-      if (currentValue.length > 0 &&
-          _prefixMoneyRegex.matchAsPrefix(currentValue) == null) {
-        _amountController.value = TextEditingValue(
-            text: previousAmountText, selection: previousAmountSelection);
+      if (currentValue.length > 0 && _prefixMoneyRegex.matchAsPrefix(currentValue) == null) {
+        _amountController.value = TextEditingValue(text: previousAmountText, selection: previousAmountSelection);
       } else {
         previousAmountText = currentValue;
         previousAmountSelection = _amountController.selection;
@@ -119,26 +113,15 @@ class TransactionFormState extends State<TransactionForm> {
     _descriptionController.text = transaction.description;
 
     getCategories().then((value) {
+      Iterable list = json.decode(utf8.decode(value.bodyBytes));
       setState(() {
+        _categories = list.map((model) => Category.fromJson(model)).toList();
+
         if (transaction.category != null) {
           _selectCategory(transaction.category);
         } else if (_categories.isNotEmpty) {
           _selectCategory(_categories.first);
         }
-      });
-    });
-  }
-
-  Future<void> getCategories() async {
-    await http.get(
-      'http://zwerschke.net:2000/categories',
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    ).then((value) {
-      Iterable list = json.decode(utf8.decode(value.bodyBytes));
-      setState(() {
-        _categories = list.map((model) => Category.fromJson(model)).toList();
       });
     });
   }
@@ -167,8 +150,7 @@ class TransactionFormState extends State<TransactionForm> {
                         controller: _categoryController,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
-                          labelText: AppLocalizations.of(context)
-                              .translate('category'),
+                          labelText: AppLocalizations.of(context).translate('category'),
                         ),
                       ),
                       itemBuilder: (context, suggestion) => ListTile(
@@ -177,9 +159,8 @@ class TransactionFormState extends State<TransactionForm> {
                       ),
                       suggestionsCallback: (pattern) {
                         List<Category> suggestions = List.from(_categories);
-                        suggestions.retainWhere((element) => element.name
-                            .toLowerCase()
-                            .startsWith(pattern.toLowerCase()));
+                        suggestions
+                            .retainWhere((element) => element.name.toLowerCase().startsWith(pattern.toLowerCase()));
 
                         return suggestions;
                       },
@@ -195,8 +176,7 @@ class TransactionFormState extends State<TransactionForm> {
                       loadingBuilder: (context) => null,
                       validator: (text) {
                         if (text == null || text.trim().isEmpty) {
-                          return AppLocalizations.of(context)
-                              .translate('category-required');
+                          return AppLocalizations.of(context).translate('category-required');
                         }
                         return null;
                       },
@@ -219,8 +199,7 @@ class TransactionFormState extends State<TransactionForm> {
                 ),
                 validator: (text) {
                   if (text == null || text.trim().isEmpty) {
-                    return AppLocalizations.of(context)
-                        .translate('date-required');
+                    return AppLocalizations.of(context).translate('date-required');
                   }
                   return null;
                 },
@@ -243,13 +222,11 @@ class TransactionFormState extends State<TransactionForm> {
                 ),
                 validator: (text) {
                   if (text == null || text.trim().isEmpty) {
-                    return AppLocalizations.of(context)
-                        .translate('amount-required');
+                    return AppLocalizations.of(context).translate('amount-required');
                   }
 
                   if (!text.isMoney()) {
-                    return AppLocalizations.of(context)
-                        .translate('amount-invalid');
+                    return AppLocalizations.of(context).translate('amount-invalid');
                   }
 
                   return null;
@@ -270,13 +247,11 @@ class TransactionFormState extends State<TransactionForm> {
                 },
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText:
-                      AppLocalizations.of(context).translate('description'),
+                  labelText: AppLocalizations.of(context).translate('description'),
                 ),
                 validator: (text) {
                   if (text == null || text.trim().isEmpty) {
-                    return AppLocalizations.of(context)
-                        .translate('description-required');
+                    return AppLocalizations.of(context).translate('description-required');
                   }
                   return null;
                 },
@@ -324,13 +299,11 @@ class TransactionFormState extends State<TransactionForm> {
         _categoryController.text != null &&
         _categoryController.text.trim().isNotEmpty) {
       int categoryId = 0;
-      if (_selectedCategory != null &&
-          _categoryController.text == _selectedCategory.name) {
+      if (_selectedCategory != null && _categoryController.text == _selectedCategory.name) {
         categoryId = _selectedCategory.id;
       }
 
-      Category category = Category(
-          id: categoryId, name: _categoryController.text, icon: _selectedIcon);
+      Category category = Category(id: categoryId, name: _categoryController.text, icon: _selectedIcon);
 
       final Transaction transaction = Transaction(
         id: widget.transaction.id,
@@ -348,18 +321,14 @@ class TransactionFormState extends State<TransactionForm> {
     widget.secondaryAction(transaction);
   }
 
-  _fieldFocusChange(
-      BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
+  _fieldFocusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
     currentFocus.unfocus();
     FocusScope.of(context).requestFocus(nextFocus);
   }
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime(1900),
-        lastDate: DateTime(2200));
+        context: context, initialDate: selectedDate, firstDate: DateTime(1900), lastDate: DateTime(2200));
 
     if (picked != null && picked != selectedDate) {
       setState(() {
@@ -376,18 +345,14 @@ class TransactionFormState extends State<TransactionForm> {
   }
 
   void _pickIcon() async {
-    IconData icon = await FlutterIconPicker.showIconPicker(context,
-        iconPackMode: IconPack.material);
+    IconData icon = await FlutterIconPicker.showIconPicker(context, iconPackMode: IconPack.material);
 
     if (icon != null) {
       setState(() {
         _selectedIcon = icon;
 
         if (_selectedCategory != null) {
-          _selectCategory(Category(
-              id: _selectedCategory.id,
-              name: _selectedCategory.name,
-              icon: icon));
+          _selectCategory(Category(id: _selectedCategory.id, name: _selectedCategory.name, icon: icon));
         }
       });
     }

@@ -14,7 +14,6 @@ class MainScreen extends StatefulWidget {
   final Store<AppState> store;
 
   MainScreen({Key key, this.store}) : super(key: key) {
-    store.dispatch(getCategories());
     store.dispatch(fetchTransactions());
   }
 
