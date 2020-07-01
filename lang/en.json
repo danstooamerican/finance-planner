@@ -3,6 +3,7 @@
   "balance": "Balance",
   "category": "Category",
   "category-required": "Category required",
+  "today": "Today",
   "date": "Date",
   "date-required": "Date required",
   "amount": "Amount",
@@ -14,5 +15,8 @@
   "edit": "Edit",
   "delete": "Delete",
   "save": "Save",
-  "description-required": "Description required"
+  "description-required": "Description required",
+  "login": "Login",
+  "login-google": "Login with Google",
+  "login-facebook": "Login with Facebook"
 }
