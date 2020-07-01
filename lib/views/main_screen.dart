@@ -13,16 +13,18 @@ import 'package:redux/redux.dart';
 class MainScreen extends StatefulWidget {
   final Store<AppState> store;
 
-  MainScreen({Key key, this.store}) : super(key: key);
+  MainScreen({Key key, this.store}) : super(key: key) {
+    store.dispatch(getCategories());
+    store.dispatch(fetchTransactions());
+  }
 
   @override
   State<StatefulWidget> createState() {
-    return new MainScreenState();
+    return MainScreenState();
   }
 }
 
-class MainScreenState extends State<MainScreen>
-    with SingleTickerProviderStateMixin {
+class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   Animation<Offset> _offsetAnimation;
   ScrollController _scrollController = ScrollController();
@@ -31,6 +33,7 @@ class MainScreenState extends State<MainScreen>
   @override
   void initState() {
     super.initState();
+
     this._animationController = AnimationController(
       duration: Duration(milliseconds: 200),
       vsync: this,
@@ -47,15 +50,13 @@ class MainScreenState extends State<MainScreen>
 
   MainScreenState() {
     _scrollController.addListener(() {
-      if (_scrollController.position.userScrollDirection ==
-          ScrollDirection.reverse) {
+      if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
         if (_fabIsVisible == true && !_animationController.isAnimating) {
           _animationController.forward();
           _fabIsVisible = false;
         }
       } else {
-        if (_scrollController.position.userScrollDirection ==
-            ScrollDirection.forward) {
+        if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
           if (_fabIsVisible == false && !_animationController.isAnimating) {
             _animationController.reverse();
             _fabIsVisible = true;
@@ -101,13 +102,10 @@ class MainScreenState extends State<MainScreen>
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          AddTransactionScreen(store: widget.store)),
+                  MaterialPageRoute(builder: (context) => AddTransactionScreen(store: widget.store)),
                 );
               },
-              tooltip:
-                  AppLocalizations.of(context).translate('add-transaction'),
+              tooltip: AppLocalizations.of(context).translate('add-transaction'),
               child: Icon(Icons.add),
             ),
           ),
