@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:redux/redux.dart';
 
@@ -23,10 +24,59 @@ class LoginScreen extends StatelessWidget {
           title: Text("Login"),
         ),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            RaisedButton(
-              child: Text("Login with Google"),
-              onPressed: () => _login(context, "/oauth2/authorize/google?redirect_uri=myandroidapp://oauth2/redirect"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    color: Colors.red,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 32, vertical: 4),
+                      title: Text(
+                        "Login with Google",
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      leading: Icon(FontAwesomeIcons.google),
+                      onTap: () =>
+                          _login(context, "/oauth2/authorize/google?redirect_uri=myandroidapp://oauth2/redirect"),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    color: Colors.blue,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 32, vertical: 4),
+                      title: Text(
+                        "Login with Facebook",
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
+                      ),
+                      leading: Icon(FontAwesomeIcons.facebookF),
+                      onTap: () =>
+                          _login(context, "/oauth2/authorize/google?redirect_uri=myandroidapp://oauth2/redirect"),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Divider(
+              indent: 8,
+              endIndent: 8,
+              thickness: 2,
             ),
           ],
         ),

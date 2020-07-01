@@ -42,6 +42,7 @@ dependencies:
   flutter_typeahead: ^1.8.3
   flutter_web_auth: ^0.2.4
   flutter_secure_storage: ^3.3.3
+  font_awesome_flutter: ^8.8.1
 
 dev_dependencies:
   flutter_test:
