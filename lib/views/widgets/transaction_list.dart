@@ -35,32 +35,43 @@ class TransactionList extends StatelessWidget {
             pinned: true,
             expandedHeight: 220.0,
             flexibleSpace: FlexibleSpaceBar(
-              title: Transform.translate(
-                offset: const Offset(-40, 0),
-                child: Text(AppLocalizations.of(context).translate('overview')),
-              ),
-              background: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                title: Transform.translate(
+                  offset: const Offset(-40, 0),
+                  child: Text(AppLocalizations.of(context).translate('overview')),
+                ),
+                background: Stack(
                   children: [
-                    AutoSizeText(
-                      AppLocalizations.of(context).translate('balance'),
-                      style: TextStyle(color: Colors.grey),
-                      textAlign: TextAlign.left,
-                      minFontSize: 30,
-                      overflow: TextOverflow.ellipsis,
+                    Positioned.fill(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AutoSizeText(
+                            AppLocalizations.of(context).translate('balance'),
+                            style: TextStyle(color: Colors.grey),
+                            textAlign: TextAlign.left,
+                            minFontSize: 30,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          AutoSizeText(
+                            balance.toMoneyFormatWithSign(),
+                            style: TextStyle(color: balance.toMoneyColor()),
+                            textAlign: TextAlign.left,
+                            minFontSize: 50,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
-                    AutoSizeText(
-                      balance.toMoneyFormatWithSign(),
-                      style: TextStyle(color: balance.toMoneyColor()),
-                      textAlign: TextAlign.left,
-                      minFontSize: 50,
-                      overflow: TextOverflow.ellipsis,
+                    Positioned(
+                      child: IconButton(
+                        icon: Icon(Icons.settings),
+                        onPressed: () {},
+                      ),
+                      right: 8,
+                      top: 8,
                     ),
                   ],
-                ),
-              ),
-            ),
+                )),
           ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
@@ -77,8 +88,7 @@ class TransactionList extends StatelessWidget {
   }
 
   double _getBalance(List<Transaction> transaction) {
-    return transaction.fold(0,
-        (previousValue, Transaction element) => previousValue + element.amount);
+    return transaction.fold(0, (previousValue, Transaction element) => previousValue + element.amount);
   }
 }
 
@@ -102,8 +112,7 @@ class _TransactionListItem extends StatelessWidget {
     }
   }
 
-  bool _isOnDifferentDayToPredecessor(
-      List<Transaction> transactions, int currentIndex, int previousIndex) {
+  bool _isOnDifferentDayToPredecessor(List<Transaction> transactions, int currentIndex, int previousIndex) {
     if (currentIndex == 0) {
       return true;
     }
@@ -137,8 +146,7 @@ class _DividerTransactionItem extends StatelessWidget {
           Padding(
             child: Text(
               _getDate(context, transaction.date),
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
             ),
             padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),
           ),
@@ -192,9 +200,7 @@ class _TransactionItem extends StatelessWidget {
       ),
       trailing: AutoSizeText(
         transaction.amount.toMoneyFormatWithSign(),
-        style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: transaction.amount.toMoneyColor()),
+        style: TextStyle(fontWeight: FontWeight.bold, color: transaction.amount.toMoneyColor()),
         textAlign: TextAlign.right,
         minFontSize: 8,
         maxLines: 1,

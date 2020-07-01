@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:financeplanner/actions/actions.dart';
 import 'package:financeplanner/models/app_state.dart';
-import 'package:financeplanner/models/category.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:global_configuration/global_configuration.dart';
@@ -99,23 +98,16 @@ ThunkAction<AppState> fetchTransactions() {
   };
 }
 
-ThunkAction<AppState> getCategories() {
-  return (Store<AppState> store) async {
-    return new Future(() async {
-      final token = await _getJWTToken();
+Future getCategories() {
+  return new Future(() async {
+    final token = await _getJWTToken();
 
-      http.get(
-        GlobalConfiguration().getString("backend") + '/categories',
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          HttpHeaders.authorizationHeader: token,
-        },
-      ).then((value) {
-        Iterable list = json.decode(utf8.decode(value.bodyBytes));
-        List<Category> categories = list.map((model) => Category.fromJson(model)).toList();
-
-        store.dispatch(UpdateCategoriesAction(categories));
-      });
-    });
-  };
+    return http.get(
+      GlobalConfiguration().getString("backend") + '/categories',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        HttpHeaders.authorizationHeader: token,
+      },
+    );
+  });
 }

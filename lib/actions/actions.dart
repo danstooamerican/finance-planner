@@ -36,9 +36,3 @@ class AddTransactionAction {
     }
   }
 }
-
-class UpdateCategoriesAction {
-  final List<Category> categories;
-
-  UpdateCategoriesAction(this.categories);
-}
