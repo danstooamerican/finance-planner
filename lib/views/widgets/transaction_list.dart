@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:financeplanner/extensions/extensions.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/transaction.dart';
+import 'package:financeplanner/views/widgets/logout_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
@@ -30,6 +31,7 @@ class TransactionList extends StatelessWidget {
       child: CustomScrollView(
         controller: scrollController,
         semanticChildCount: transactions.length,
+        physics: AlwaysScrollableScrollPhysics(),
         slivers: <Widget>[
           SliverAppBar(
             pinned: true,
@@ -63,10 +65,7 @@ class TransactionList extends StatelessWidget {
                       ),
                     ),
                     Positioned(
-                      child: IconButton(
-                        icon: Icon(Icons.settings),
-                        onPressed: () {},
-                      ),
+                      child: LogoutButton(store),
                       right: 8,
                       top: 8,
                     ),
