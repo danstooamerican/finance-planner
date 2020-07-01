@@ -46,7 +46,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                       leading: Icon(FontAwesomeIcons.google),
                       onTap: () =>
-                          _login(context, "/oauth2/authorize/google?redirect_uri=myandroidapp://oauth2/redirect"),
+                          _login(context, "/oauth2/authorize/google?redirect_uri=financeplanner://oauth2/redirect"),
                     ),
                   ),
                 ),
@@ -69,7 +69,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                       leading: Icon(FontAwesomeIcons.facebookF),
                       onTap: () =>
-                          _login(context, "/oauth2/authorize/google?redirect_uri=myandroidapp://oauth2/redirect"),
+                          _login(context, "/oauth2/authorize/facebook?redirect_uri=financeplanner://oauth2/redirect"),
                     ),
                   ),
                 ),
@@ -89,7 +89,7 @@ class LoginScreen extends StatelessWidget {
   Future<void> _login(BuildContext context, String authUrl) async {
     final result = await FlutterWebAuth.authenticate(
       url: GlobalConfiguration().getString("backend") + authUrl,
-      callbackUrlScheme: "myandroidapp",
+      callbackUrlScheme: "financeplanner",
     ).catchError((e) {
       return null;
     });
