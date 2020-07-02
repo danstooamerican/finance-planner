@@ -10,6 +10,7 @@ import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:redux/redux.dart';
+import 'package:flare_flutter/flare_actor.dart';
 
 class LoginScreen extends StatefulWidget {
   final Store<AppState> store;
@@ -111,14 +112,12 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
                 left: 16,
                 right: 16,
                 top: 160,
-                child: Opacity(
-                  opacity: icon.value,
-                  child: Icon(
-                    Icons.attach_money,
-                    size: 400,
-                    color: Colors.green,
-                  ),
-                ),
+                child: Container(
+                    height: 300,
+                    child: FlareActor(
+                      'assets/animations/wallet.flr',
+                      animation: 'Idle',
+                    )),
               ),
               Positioned(
                 bottom: 170 + _offset * google.value,
