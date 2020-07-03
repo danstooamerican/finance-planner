@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
-import 'package:financeplanner/views/main_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -11,6 +10,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:redux/redux.dart';
 import 'package:flare_flutter/flare_actor.dart';
+
+import 'file:///C:/Users/danie/Documents/Projekte/finance-planner/lib/views/main_view/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final Store<AppState> store;

@@ -1,102 +1,95 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:financeplanner/dependency_injection_config.dart';
 import 'package:financeplanner/extensions/extensions.dart';
-import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/transaction.dart';
 import 'package:financeplanner/views/widgets/logout_button.dart';
+import 'package:financeplanner/views/widgets/transaction_list/transaction_list_viewmodel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:redux/redux.dart';
+import 'package:stacked/stacked.dart';
 
-import '../../app_localizations.dart';
-import '../detail_transaction_screen.dart';
+import '../../../app_localizations.dart';
+import '../../detail_transaction_screen.dart';
 
 class TransactionList extends StatelessWidget {
-  final Store<AppState> store;
-  final List<Transaction> transactions;
-  final VoidCallback onRefresh;
   final ScrollController scrollController;
 
   TransactionList({
-    @required this.store,
-    @required this.transactions,
-    this.onRefresh,
     this.scrollController,
   });
 
   @override
   Widget build(BuildContext context) {
-    double balance = _getBalance(transactions);
-
-    return RefreshIndicator(
-      child: CustomScrollView(
-        controller: scrollController,
-        semanticChildCount: transactions.length,
-        physics: AlwaysScrollableScrollPhysics(),
-        slivers: <Widget>[
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: 220.0,
-            flexibleSpace: FlexibleSpaceBar(
-                title: Transform.translate(
-                  offset: const Offset(-40, 0),
-                  child: Text(AppLocalizations.of(context).translate('overview')),
+    return ViewModelBuilder<TransactionListViewModel>.reactive(
+      builder: (context, model, child) {
+        return RefreshIndicator(
+          child: CustomScrollView(
+            controller: scrollController,
+            semanticChildCount: model.amtTransactions,
+            physics: AlwaysScrollableScrollPhysics(),
+            slivers: <Widget>[
+              SliverAppBar(
+                pinned: true,
+                expandedHeight: 220.0,
+                flexibleSpace: FlexibleSpaceBar(
+                    title: Transform.translate(
+                      offset: const Offset(-40, 0),
+                      child: Text(AppLocalizations.of(context).translate('overview')),
+                    ),
+                    background: Stack(
+                      children: [
+                        Positioned.fill(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              AutoSizeText(
+                                AppLocalizations.of(context).translate('balance'),
+                                style: TextStyle(color: Colors.grey),
+                                textAlign: TextAlign.left,
+                                minFontSize: 30,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              AutoSizeText(
+                                model.balance,
+                                style: TextStyle(color: model.balanceColor),
+                                textAlign: TextAlign.left,
+                                minFontSize: 50,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Positioned(
+                          child: LogoutButton(),
+                          right: 8,
+                          top: 8,
+                        ),
+                      ],
+                    )),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    return _TransactionListItem(index, model.transactions);
+                  },
+                  childCount: model.amtTransactions,
                 ),
-                background: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          AutoSizeText(
-                            AppLocalizations.of(context).translate('balance'),
-                            style: TextStyle(color: Colors.grey),
-                            textAlign: TextAlign.left,
-                            minFontSize: 30,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          AutoSizeText(
-                            balance.toMoneyFormatWithSign(),
-                            style: TextStyle(color: balance.toMoneyColor()),
-                            textAlign: TextAlign.left,
-                            minFontSize: 50,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      child: LogoutButton(store),
-                      right: 8,
-                      top: 8,
-                    ),
-                  ],
-                )),
+              ),
+            ],
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                return _TransactionListItem(index, transactions, store);
-              },
-              childCount: transactions.length,
-            ),
-          ),
-        ],
-      ),
-      onRefresh: onRefresh,
+          onRefresh: model.updateTransactionList,
+        );
+      },
+      viewModelBuilder: () => locator<TransactionListViewModel>(),
     );
-  }
-
-  double _getBalance(List<Transaction> transaction) {
-    return transaction.fold(0, (previousValue, Transaction element) => previousValue + element.amount);
   }
 }
 
 class _TransactionListItem extends StatelessWidget {
   final int index;
   final List<Transaction> transactions;
-  final Store<AppState> store;
 
-  _TransactionListItem(this.index, this.transactions, this.store);
+  _TransactionListItem(this.index, this.transactions);
 
   @override
   Widget build(BuildContext context) {
@@ -105,9 +98,9 @@ class _TransactionListItem extends StatelessWidget {
 
     Transaction transaction = transactions[current];
     if (_isOnDifferentDayToPredecessor(transactions, current, previous)) {
-      return _DividerTransactionItem(transaction, store);
+      return _DividerTransactionItem(transaction);
     } else {
-      return new _TransactionItem(transaction, store);
+      return new _TransactionItem(transaction);
     }
   }
 
@@ -131,10 +124,9 @@ class _TransactionListItem extends StatelessWidget {
 }
 
 class _DividerTransactionItem extends StatelessWidget {
-  final Store<AppState> store;
   final Transaction transaction;
 
-  _DividerTransactionItem(this.transaction, this.store);
+  _DividerTransactionItem(this.transaction);
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +149,7 @@ class _DividerTransactionItem extends StatelessWidget {
             endIndent: 16,
           ),
           Padding(
-            child: _TransactionItem(transaction, store),
+            child: _TransactionItem(transaction),
             padding: const EdgeInsets.only(top: 8),
           )
         ],
@@ -176,10 +168,9 @@ class _DividerTransactionItem extends StatelessWidget {
 }
 
 class _TransactionItem extends StatelessWidget {
-  final Store<AppState> store;
   final Transaction transaction;
 
-  _TransactionItem(this.transaction, this.store);
+  _TransactionItem(this.transaction);
 
   @override
   Widget build(BuildContext context) {
@@ -208,10 +199,7 @@ class _TransactionItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => DetailTransactionScreen(
-              store: store,
-              transaction: transaction,
-            ),
+            builder: (context) => DetailTransactionScreen(transaction: transaction),
           ),
         );
       },

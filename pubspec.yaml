@@ -33,6 +33,12 @@ dependencies:
   cupertino_icons: ^0.1.3
   global_configuration: ^1.5.0
 
+  stacked: ^1.6.1+1
+  stacked_hooks:
+  flutter_hooks:
+  injectable:
+  get_it:
+
   redux: ^3.0.0
   flutter_redux: ^0.5.3
   redux_thunk: ^0.2.1
@@ -46,6 +52,8 @@ dependencies:
   font_awesome_flutter: ^8.8.1
 
 dev_dependencies:
+  injectable_generator:
+  build_runner:
   flutter_test:
     sdk: flutter
 
