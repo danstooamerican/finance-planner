@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:financeplanner/extensions/extensions.dart';
 import 'package:financeplanner/middleware/middleware.dart';
-import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/category.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,13 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconpicker/flutter_iconpicker.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:redux/redux.dart';
 
-import '../../app_localizations.dart';
+import '../../../app_localizations.dart';
 
 class TransactionForm extends StatefulWidget {
   final Transaction transaction;
-  final Store<AppState> store;
 
   final String primaryActionText;
   final String secondaryActionText;
@@ -28,7 +25,6 @@ class TransactionForm extends StatefulWidget {
 
   factory TransactionForm.empty(
       {Key key,
-      @required Store store,
       @required Function(Transaction) primaryAction,
       Function(Transaction) secondaryAction,
       @required String primaryText,
@@ -43,7 +39,6 @@ class TransactionForm extends StatefulWidget {
 
     return TransactionForm.filled(
       key: key,
-      store: store,
       transaction: transaction,
       primaryAction: primaryAction,
       secondaryAction: secondaryAction,
@@ -54,7 +49,6 @@ class TransactionForm extends StatefulWidget {
 
   TransactionForm.filled({
     Key key,
-    @required this.store,
     @required this.transaction,
     @required this.primaryAction,
     this.secondaryAction,
@@ -69,23 +63,15 @@ class TransactionForm extends StatefulWidget {
 }
 
 class TransactionFormState extends State<TransactionForm> {
-  DateTime selectedDate = DateTime.now();
-
   TextEditingController _descriptionController = new TextEditingController();
   TextEditingController _amountController = TextEditingController();
   TextEditingController _dateController = new TextEditingController();
   TextEditingController _categoryController = new TextEditingController();
 
-  Category _selectedCategory;
-  List<Category> _categories = List();
-  IconData _selectedIcon = Icons.category;
-
   final FocusNode _amountFocus = FocusNode();
   final FocusNode _descriptionFocus = FocusNode();
   final FocusNode _categoryFocus = FocusNode();
   final FocusNode _dateFocus = FocusNode();
-
-  final Transaction transaction;
 
   final GlobalKey<FormState> _formKey = GlobalKey();
 
@@ -107,23 +93,6 @@ class TransactionFormState extends State<TransactionForm> {
 
     previousAmountText = _amountController.text;
     previousAmountSelection = _amountController.selection;
-
-    _setDate(transaction.date);
-    _amountController.text = transaction.amount?.formatMoneyToEdit();
-    _descriptionController.text = transaction.description;
-
-    getCategories().then((value) {
-      Iterable list = json.decode(utf8.decode(value.bodyBytes));
-      setState(() {
-        _categories = list.map((model) => Category.fromJson(model)).toList();
-
-        if (transaction.category != null) {
-          _selectCategory(transaction.category);
-        } else if (_categories.isNotEmpty) {
-          _selectCategory(_categories.first);
-        }
-      });
-    });
   }
 
   @override
@@ -281,7 +250,7 @@ class TransactionFormState extends State<TransactionForm> {
                       padding: const EdgeInsets.all(8),
                       child: new RaisedButton(
                         color: Colors.red,
-                        onPressed: submitSecondaryAction,
+                        onPressed: model.submitSecondaryAction,
                         child: Text(widget.secondaryActionText),
                       ),
                     ),
@@ -295,75 +264,31 @@ class TransactionFormState extends State<TransactionForm> {
   }
 
   void submitPrimaryAction() {
-    if (_formKey.currentState.validate() &&
-        _categoryController.text != null &&
-        _categoryController.text.trim().isNotEmpty) {
-      int categoryId = 0;
-      if (_selectedCategory != null && _categoryController.text == _selectedCategory.name) {
-        categoryId = _selectedCategory.id;
-      }
-
-      Category category = Category(id: categoryId, name: _categoryController.text, icon: _selectedIcon);
-
-      final Transaction transaction = Transaction(
-        id: widget.transaction.id,
-        category: category,
-        description: _descriptionController.text.trim(),
-        amount: _amountController.text.parseMoney(),
-        dateTime: selectedDate,
-      );
-
-      widget.primaryAction(transaction);
+    if (_formKey.currentState.validate()) {
+      model.submitPrimaryAction();
     }
   }
 
-  void submitSecondaryAction() {
-    widget.secondaryAction(transaction);
-  }
-
-  _fieldFocusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
-    currentFocus.unfocus();
-    FocusScope.of(context).requestFocus(nextFocus);
-  }
-
-  Future<Null> _selectDate(BuildContext context) async {
+  void _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
-        context: context, initialDate: selectedDate, firstDate: DateTime(1900), lastDate: DateTime(2200));
+        context: context, initialDate: model.selectedDate, firstDate: DateTime(1900), lastDate: DateTime(2200));
 
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        _setDate(picked);
-      });
-    }
+    model.selectedDate = picked;
+    _dateController.text = date.toDateFormat();
 
     _fieldFocusChange(context, _dateFocus, _amountFocus);
-  }
-
-  void _setDate(DateTime date) {
-    selectedDate = date;
-    _dateController.text = date.toDateFormat();
   }
 
   void _pickIcon() async {
     IconData icon = await FlutterIconPicker.showIconPicker(context, iconPackMode: IconPack.material);
 
-    if (icon != null) {
-      setState(() {
-        _selectedIcon = icon;
-
-        if (_selectedCategory != null) {
-          _selectCategory(Category(id: _selectedCategory.id, name: _selectedCategory.name, icon: icon));
-        }
-      });
-    }
+    model.selectedIcon = icon;
+    _categoryController.text = model.categoryName;
   }
 
-  void _selectCategory(Category category) {
-    if (category != null) {
-      _selectedCategory = category;
-      _categoryController.text = category.name;
-      _selectedIcon = category.icon;
-    }
+  _fieldFocusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
+    currentFocus.unfocus();
+    FocusScope.of(context).requestFocus(nextFocus);
   }
 
   @override

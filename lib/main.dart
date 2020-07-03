@@ -10,6 +10,7 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 import 'app_localizations.dart';
+import 'dependency_injection_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,7 @@ void main() async {
   final store =
       Store<AppState>(appReducer, initialState: AppState(transactions: new List()), middleware: [thunkMiddleware]);
 
+  setupLocator();
   runApp(MaterialApp(
       title: 'Finance App',
       theme: ThemeData.dark(),

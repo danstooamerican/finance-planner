@@ -1,11 +1,12 @@
 import 'package:financeplanner/middleware/middleware.dart';
 import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/models/models.dart';
-import 'package:financeplanner/views/widgets/transaction_form.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
+
+import 'file:///C:/Users/danie/Documents/Projekte/finance-planner/lib/views/widgets/transaction_form/transaction_form.dart';
 
 import '../app_localizations.dart';
 
@@ -27,8 +28,7 @@ class AddTransactionState extends State<AddTransactionScreen> {
       store: widget.store,
       child: Scaffold(
           appBar: AppBar(
-            title:
-                Text(AppLocalizations.of(context).translate('add-transaction')),
+            title: Text(AppLocalizations.of(context).translate('add-transaction')),
           ),
           body: Padding(
               child: TransactionForm.empty(

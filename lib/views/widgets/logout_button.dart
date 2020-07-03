@@ -1,16 +1,10 @@
-import 'package:financeplanner/models/app_state.dart';
 import 'package:financeplanner/views/login_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:redux/redux.dart';
 
 class LogoutButton extends StatelessWidget {
   static final int _logoutButton = 1;
-
-  Store<AppState> store;
-
-  LogoutButton(this.store);
 
   @override
   Widget build(BuildContext context) {
@@ -37,9 +31,7 @@ class LogoutButton extends StatelessWidget {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => LoginScreen(
-          store: store,
-        ),
+        builder: (context) => LoginScreen(),
       ),
     );
   }
