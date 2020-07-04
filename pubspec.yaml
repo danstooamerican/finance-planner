@@ -23,7 +23,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flare_flutter: ^2.0.4
 
   flutter_localizations:
     sdk: flutter
@@ -39,7 +38,7 @@ dependencies:
   injectable:
   get_it:
   observable_ish:
-
+  flare_flutter: ^2.0.4
   intl: ^0.16.1
   auto_size_text: ^2.1.0
   http: ^0.12.1

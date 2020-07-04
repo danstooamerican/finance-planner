@@ -18,67 +18,77 @@ class TransactionList extends StatelessWidget {
     this.scrollController,
   });
 
+  final OverlayEntry entry = OverlayEntry(builder: (context) {
+    return Center(child: CircularProgressIndicator());
+  });
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<TransactionListViewModel>.reactive(
       builder: (context, model, child) {
-        return RefreshIndicator(
-          child: CustomScrollView(
-            controller: scrollController,
-            semanticChildCount: model.amtTransactions,
-            physics: AlwaysScrollableScrollPhysics(),
-            slivers: <Widget>[
-              SliverAppBar(
-                pinned: true,
-                expandedHeight: 220.0,
-                flexibleSpace: FlexibleSpaceBar(
-                    title: Transform.translate(
-                      offset: const Offset(-40, 0),
-                      child: Text(AppLocalizations.of(context).translate('overview')),
-                    ),
-                    background: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              AutoSizeText(
-                                AppLocalizations.of(context).translate('balance'),
-                                style: TextStyle(color: Colors.grey),
-                                textAlign: TextAlign.left,
-                                minFontSize: 30,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              AutoSizeText(
-                                model.balance,
-                                style: TextStyle(color: model.balanceColor),
-                                textAlign: TextAlign.left,
-                                minFontSize: 50,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+        if (model.busy(model.transactions)) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        } else {
+          return RefreshIndicator(
+            child: CustomScrollView(
+              controller: scrollController,
+              semanticChildCount: model.amtTransactions,
+              physics: AlwaysScrollableScrollPhysics(),
+              slivers: <Widget>[
+                SliverAppBar(
+                  pinned: true,
+                  expandedHeight: 220.0,
+                  flexibleSpace: FlexibleSpaceBar(
+                      title: Transform.translate(
+                        offset: const Offset(-40, 0),
+                        child: Text(AppLocalizations.of(context).translate('overview')),
+                      ),
+                      background: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AutoSizeText(
+                                  AppLocalizations.of(context).translate('balance'),
+                                  style: TextStyle(color: Colors.grey),
+                                  textAlign: TextAlign.left,
+                                  minFontSize: 30,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                AutoSizeText(
+                                  model.balance,
+                                  style: TextStyle(color: model.balanceColor),
+                                  textAlign: TextAlign.left,
+                                  minFontSize: 50,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        Positioned(
-                          child: LogoutButton(),
-                          right: 8,
-                          top: 8,
-                        ),
-                      ],
-                    )),
-              ),
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (BuildContext context, int index) {
-                    return _TransactionListItem(index, model.transactions);
-                  },
-                  childCount: model.amtTransactions,
+                          Positioned(
+                            child: LogoutButton(),
+                            right: 8,
+                            top: 8,
+                          ),
+                        ],
+                      )),
                 ),
-              ),
-            ],
-          ),
-          onRefresh: model.updateTransactionList,
-        );
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return _TransactionListItem(index, model.transactions);
+                    },
+                    childCount: model.amtTransactions,
+                  ),
+                ),
+              ],
+            ),
+            onRefresh: model.updateTransactionList,
+          );
+        }
       },
       viewModelBuilder: () => locator<TransactionListViewModel>(),
     );
