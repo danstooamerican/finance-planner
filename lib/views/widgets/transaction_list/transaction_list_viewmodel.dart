@@ -11,21 +11,21 @@ class TransactionListViewModel extends BaseViewModel {
   final TransactionService _transactionService;
 
   List<Transaction> _transactions;
-  List<Transaction> get transactions => _transactions;
-  int get amtTransactions => _transactions.length;
+  List<Transaction> get transactions => _transactions ?? [];
+  int get amtTransactions => _transactions?.length ?? 0;
 
-  String get balance => _getBalance().toMoneyFormatWithSign();
-  Color get balanceColor => _getBalance().toMoneyColor();
+  String get balance => _getBalance()?.toMoneyFormatWithSign() ?? '';
+  Color get balanceColor => _getBalance()?.toMoneyColor();
 
   TransactionListViewModel(this._transactionService) {
     updateTransactionList();
   }
 
   double _getBalance() {
-    return _transactions.fold(0, (previousValue, Transaction element) => previousValue + element.amount);
+    return _transactions?.fold(0, (previousValue, Transaction element) => previousValue + element.amount);
   }
 
-  void updateTransactionList() async {
+  Future<void> updateTransactionList() async {
     _transactions = await runBusyFuture(
       _transactionService.fetchTransactions().then(
         (value) {

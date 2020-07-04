@@ -1,22 +1,18 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:financeplanner/models/app_state.dart';
-import 'package:financeplanner/models/models.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:redux/redux.dart';
 import 'package:flare_flutter/flare_actor.dart';
 
 import 'file:///C:/Users/danie/Documents/Projekte/finance-planner/lib/views/main_view/main_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  final Store<AppState> store;
+import '../app_localizations.dart';
 
-  LoginScreen({Key key, this.store}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  LoginScreen({Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -84,10 +80,8 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
 
   @override
   Widget build(BuildContext context) {
-    return StoreProvider<AppState>(
-      store: widget.store,
-      child: Material(
-          child: AnimatedBuilder(
+    return Material(
+      child: AnimatedBuilder(
         animation: _animationController,
         builder: (context, _) {
           return Stack(
@@ -97,7 +91,7 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
                 left: 16,
                 right: 16,
                 child: AutoSizeText(
-                  "Finance Planner",
+                  AppLocalizations.of(context).translate('app-title'),
                   minFontSize: 40,
                   maxFontSize: 50,
                   style: TextStyle(
@@ -129,7 +123,7 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
                   icon: Icon(FontAwesomeIcons.google),
                   color: Colors.red,
                   label: Text(
-                    "Login with Google",
+                    AppLocalizations.of(context).translate('login-google'),
                     style: TextStyle(
                       fontSize: 20,
                     ),
@@ -146,7 +140,7 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
                   icon: Icon(FontAwesomeIcons.facebookF),
                   color: Colors.blue,
                   label: Text(
-                    "Login with Facebook",
+                    AppLocalizations.of(context).translate('login-facebook'),
                     style: TextStyle(
                       fontSize: 20,
                     ),
@@ -157,7 +151,7 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
             ],
           );
         },
-      )),
+      ),
     );
   }
 
@@ -183,13 +177,6 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
   }
 
   void _goToMainScreen(BuildContext context) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MainScreen(
-          store: widget.store,
-        ),
-      ),
-    );
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen()));
   }
 }

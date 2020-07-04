@@ -38,10 +38,8 @@ dependencies:
   flutter_hooks:
   injectable:
   get_it:
+  observable_ish:
 
-  redux: ^3.0.0
-  flutter_redux: ^0.5.3
-  redux_thunk: ^0.2.1
   intl: ^0.16.1
   auto_size_text: ^2.1.0
   http: ^0.12.1

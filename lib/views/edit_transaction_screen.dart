@@ -1,10 +1,10 @@
-import 'package:financeplanner/middleware/middleware.dart';
-import 'package:financeplanner/models/app_state.dart';
+import 'package:financeplanner/dependency_injection_config.dart';
 import 'package:financeplanner/models/models.dart';
+import 'package:financeplanner/services/transactions_service.dart';
+import 'package:financeplanner/views/widgets/transaction_form/transaction_form_viewmodel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_redux/flutter_redux.dart';
-import 'package:redux/redux.dart';
+import 'package:stacked/stacked.dart';
 
 import 'file:///C:/Users/danie/Documents/Projekte/finance-planner/lib/views/main_view/main_screen.dart';
 import 'file:///C:/Users/danie/Documents/Projekte/finance-planner/lib/views/widgets/transaction_form/transaction_form.dart';
@@ -12,50 +12,61 @@ import 'file:///C:/Users/danie/Documents/Projekte/finance-planner/lib/views/widg
 import '../app_localizations.dart';
 
 class EditTransactionScreen extends StatefulWidget {
-  final Store<AppState> store;
   final Transaction transaction;
 
-  EditTransactionScreen({Key key, this.store, this.transaction}) : super(key: key);
+  EditTransactionScreen({Key key, this.transaction}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return new EditTransactionState();
+    return new EditTransactionState(transaction);
   }
 }
 
 class EditTransactionState extends State<EditTransactionScreen> {
+  final TransactionService _transactionService = locator<TransactionService>();
+
+  TransactionFormViewModel _transactionFormViewModel;
+
+  EditTransactionState(Transaction transaction) {
+    _transactionFormViewModel = locator<TransactionFormViewModel>();
+    _transactionFormViewModel.initialize(transaction, editTransactionAction, deleteTransactionAction);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return StoreProvider<AppState>(
-      store: widget.store,
-      child: Scaffold(
-          appBar: AppBar(
-            title: Text(AppLocalizations.of(context).translate('edit-transaction')),
-          ),
-          body: Padding(
-            child: TransactionForm.filled(
-              transaction: widget.transaction,
-              primaryAction: editTransactionAction,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context).translate('edit-transaction')),
+      ),
+      body: Padding(
+        child: ViewModelBuilder.nonReactive(
+          viewModelBuilder: () => _transactionFormViewModel,
+          builder: (context, model, child) {
+            return TransactionForm.filled(
               primaryActionText: AppLocalizations.of(context).translate('edit'),
-              secondaryAction: deleteTransactionAction,
               secondaryActionText: AppLocalizations.of(context).translate('delete'),
-              store: widget.store,
-            ),
-            padding: const EdgeInsets.only(top: 16),
-          )),
+            );
+          },
+        ),
+        padding: const EdgeInsets.only(top: 16),
+      ),
     );
   }
 
   void editTransactionAction(Transaction transaction) {
-    widget.store.dispatch(editTransaction(transaction));
+    _transactionService.editTransaction(transaction);
 
     Navigator.pop(context, transaction);
   }
 
   void deleteTransactionAction(Transaction transaction) {
-    widget.store.dispatch(deleteTransaction(transaction.id));
+    _transactionService.deleteTransaction(transaction.id);
 
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => MainScreen(store: widget.store)),
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MainScreen(),
+        ),
         (Route<dynamic> route) => false);
   }
 }

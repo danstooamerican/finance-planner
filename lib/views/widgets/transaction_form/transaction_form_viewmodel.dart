@@ -9,18 +9,23 @@ import 'package:stacked/stacked.dart';
 
 @injectable
 class TransactionFormViewModel extends BaseViewModel {
-  final Function(Transaction) primaryAction;
+  Function(Transaction) primaryAction;
 
   //// No form checks are performed before this action is called.
-  final Function(Transaction) secondaryAction;
+  Function(Transaction) secondaryAction;
 
   final TransactionService _transactionService;
-  final Transaction _transaction;
+  Transaction _transaction;
 
   List<Category> _categories;
   List<Category> get categories => _categories;
 
-  String categoryName;
+  String _categoryName;
+  String get categoryName => _categoryName ?? '';
+  set categoryName(String value) {
+    _categoryName = value;
+    notifyListeners();
+  }
 
   Category _selectedCategory;
   Category get selectedCategory => _selectedCategory;
@@ -28,7 +33,7 @@ class TransactionFormViewModel extends BaseViewModel {
     if (category != null) {
       _selectedCategory = category;
       _selectedIcon = category.icon;
-      categoryName = category.name;
+      _categoryName = category.name;
 
       notifyListeners();
     }
@@ -57,46 +62,46 @@ class TransactionFormViewModel extends BaseViewModel {
     }
   }
 
-  String _title;
-  String get title => _title;
+  String title;
 
-  String _description;
-  String get description => _description;
+  String description;
 
-  double _amount;
-  double get amount => _amount;
-  String get amountString => _amount.formatMoneyToEdit();
+  double _amountValue;
+  String get amount => _amountValue?.formatMoneyToEdit() ?? '';
+  set amount(String value) => _amountValue = value.parseMoney();
 
-  TransactionFormViewModel(this._transactionService, @factoryParam this._transaction, @factoryParam this.primaryAction,
-      @factoryParam this.secondaryAction) {
+  TransactionFormViewModel(this._transactionService);
+
+  void initialize(Transaction transaction, Function(Transaction) primaryAction, Function(Transaction) secondaryAction) {
+    _transaction = transaction;
+    this.primaryAction = primaryAction;
+    this.secondaryAction = secondaryAction;
     _categories = List();
-    updateCategories();
+    _updateCategories();
 
-    if (_transaction != null) {
-      _selectedCategory = _transaction.category;
-      _selectedIcon = _transaction.category.icon;
-      _selectedDate = _transaction.date;
-      _amount = _transaction.amount;
-      _description = _transaction.description;
+    if (_transaction != null && _transaction.id != 0) {
+      selectedCategory = _transaction.category;
+      selectedIcon = _transaction.category.icon;
+      selectedDate = _transaction.date;
+      _amountValue = _transaction.amount;
+      description = _transaction.description;
     } else {
-      _selectedDate = DateTime.now();
-      _selectedIcon = Icons.category;
+      selectedDate = DateTime.now();
+      selectedIcon = Icons.category;
     }
   }
 
-  void updateCategories() async {
+  void _updateCategories() async {
     _categories = await runBusyFuture(
-      _transactionService.getCategories().then((value) {
-        if (value != null && value.length > 0 && _selectedCategory == null) {
-          _selectedCategory = value.first;
-        }
-
-        return value;
-      }),
+      _transactionService.getCategories(),
       busyObject: _categories,
-    );
+    ).then((value) {
+      if (value != null && value.length > 0 && selectedCategory == null) {
+        selectedCategory = value.first;
+      }
 
-    notifyListeners();
+      return value;
+    });
   }
 
   void submitPrimaryAction() {
@@ -112,7 +117,7 @@ class TransactionFormViewModel extends BaseViewModel {
         id: _transaction.id,
         category: category,
         description: description.trim(),
-        amount: amount,
+        amount: _amountValue,
         dateTime: selectedDate,
       );
 
