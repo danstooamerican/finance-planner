@@ -1,11 +1,9 @@
+import 'package:financeplanner/app_localizations.dart';
+import 'package:financeplanner/views/add_transaction_screen.dart';
+import 'package:financeplanner/views/widgets/transaction_list/transaction_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
-import 'file:///C:/Users/danie/Documents/Projekte/finance-planner/lib/views/widgets/transaction_list/transaction_list.dart';
-
-import '../../app_localizations.dart';
-import '../add_transaction_screen.dart';
 
 class MainScreen extends StatefulWidget {
   @override

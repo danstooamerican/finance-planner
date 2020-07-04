@@ -1,4 +1,5 @@
 {
+  "app-title": "Finanz Planer",
   "overview": "Übersicht",
   "balance": "Bilanz",
   "category": "Kategorie",
@@ -17,7 +18,6 @@
   "delete": "Löschen",
   "save": "Speichern",
   "description-required": "Beschreibung benötigt",
-  "login": "Anmelden",
   "login-google": "Mit Google anmelden",
   "login-facebook": "Mit Facebook anmelden"
 }
