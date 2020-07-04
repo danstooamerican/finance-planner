@@ -42,7 +42,7 @@ class TransactionListViewModel extends ReactiveViewModel {
   Future<void> updateTransactionList() async {
     await runBusyFuture(
       _transactionService.fetchTransactions(),
-      busyObject: _transactionService.transactions,
+      busyObject: transactions,
     );
   }
 
