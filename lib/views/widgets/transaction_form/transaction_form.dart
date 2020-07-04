@@ -47,6 +47,12 @@ class TransactionForm extends HookViewModelWidget<TransactionFormViewModel> {
       return null;
     }, [model.categoryName]);
 
+    useEffect(() {
+      selectedDate.text = model.selectedDate.toDateFormat();
+
+      return null;
+    }, [model.selectedDate]);
+
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
