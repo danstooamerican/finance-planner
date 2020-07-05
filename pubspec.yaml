@@ -69,6 +69,7 @@ flutter:
   assets:
     - assets/cfg/
     - assets/animations/wallet.flr
+    - assets/animations/background.flr
     - lang/en.json
     - lang/de.json
 
