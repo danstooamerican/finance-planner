@@ -4,6 +4,7 @@ import 'package:financeplanner/extensions/extensions.dart';
 import 'package:financeplanner/models/transaction.dart';
 import 'package:financeplanner/views/widgets/logout_button.dart';
 import 'package:financeplanner/views/widgets/transaction_list/transaction_list_viewmodel.dart';
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
@@ -47,6 +48,23 @@ class TransactionList extends StatelessWidget {
                       ),
                       background: Stack(
                         children: [
+                          Positioned(
+                            left: 16,
+                            top: 16,
+                            child: Container(
+                              width: 128,
+                              height: 48,
+                              child: Hero(
+                                tag: 'wallet',
+                                child: FlareActor(
+                                  'assets/animations/wallet.flr',
+                                  animation: 'Idle',
+                                  fit: BoxFit.contain,
+                                  alignment: Alignment.centerLeft,
+                                ),
+                              ),
+                            ),
+                          ),
                           Positioned.fill(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,

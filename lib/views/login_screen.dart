@@ -1,13 +1,12 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:financeplanner/views/main_view/main_screen.dart';
+import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:global_configuration/global_configuration.dart';
-import 'package:flare_flutter/flare_actor.dart';
-
-import 'file:///C:/Users/danie/Documents/Projekte/finance-planner/lib/views/main_view/main_screen.dart';
 
 import '../app_localizations.dart';
 
@@ -80,12 +79,19 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: AnimatedBuilder(
+    return Scaffold(
+      body: AnimatedBuilder(
         animation: _animationController,
         builder: (context, _) {
           return Stack(
             children: [
+              Positioned.fill(
+                child: FlareActor(
+                  'assets/animations/background.flr',
+                  animation: "idle",
+                  fit: BoxFit.fill,
+                ),
+              ),
               Positioned(
                 top: 100,
                 left: 16,
@@ -103,16 +109,21 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
                   textAlign: TextAlign.center,
                 ),
               ),
-              Positioned(
+              Positioned.fill(
                 left: 16,
                 right: 16,
                 top: 160,
                 child: Container(
-                    height: 300,
+                  child: Hero(
+                    tag: 'wallet',
                     child: FlareActor(
                       'assets/animations/wallet.flr',
                       animation: 'Idle',
-                    )),
+                      fit: BoxFit.fitWidth,
+                      alignment: Alignment.topCenter,
+                    ),
+                  ),
+                ),
               ),
               Positioned(
                 bottom: 170 + _offset * google.value,
@@ -172,11 +183,12 @@ class LoginScreenState extends State<LoginScreen> with SingleTickerProviderState
       final storage = FlutterSecureStorage();
       await storage.write(key: "jwt", value: "Bearer " + token);
 
-      _goToMainScreen(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MainScreen(),
+        ),
+      );
     }
-  }
-
-  void _goToMainScreen(BuildContext context) {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen()));
   }
 }

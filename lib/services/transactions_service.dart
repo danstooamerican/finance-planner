@@ -42,7 +42,9 @@ class TransactionService with ReactiveServiceMixin {
       body: jsonEncode(transaction),
     )
         .then((value) {
-      _transactions.value.add(transaction);
+      List<Transaction> newTransactions = _transactions.value;
+      newTransactions.add(transaction);
+      _transactions.value = newTransactions;
       fetchTransactions();
     });
   }
