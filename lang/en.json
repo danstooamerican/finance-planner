@@ -19,5 +19,6 @@
   "description-required": "Description required",
   "login": "Login",
   "login-google": "Login with Google",
-  "login-facebook": "Login with Facebook"
+  "login-facebook": "Login with Facebook",
+  "login-error": "Failed to Log In"
 }
