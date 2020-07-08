@@ -19,5 +19,6 @@
   "save": "Speichern",
   "description-required": "Beschreibung benötigt",
   "login-google": "Mit Google anmelden",
-  "login-facebook": "Mit Facebook anmelden"
+  "login-facebook": "Mit Facebook anmelden",
+  "login-error": "Login fehlgeschlagen"
 }
