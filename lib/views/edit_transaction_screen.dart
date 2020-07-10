@@ -1,15 +1,14 @@
 import 'package:financeplanner/dependency_injection_config.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:financeplanner/services/transactions_service.dart';
+import 'package:financeplanner/views/widgets/transaction_form/transaction_form.dart';
 import 'package:financeplanner/views/widgets/transaction_form/transaction_form_viewmodel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
-import 'file:///C:/Users/danie/Documents/Projekte/finance-planner/lib/views/main_view/main_screen.dart';
-import 'file:///C:/Users/danie/Documents/Projekte/finance-planner/lib/views/widgets/transaction_form/transaction_form.dart';
-
 import '../app_localizations.dart';
+import 'main_view/main_screen.dart';
 
 class EditTransactionScreen extends StatefulWidget {
   final Transaction transaction;
@@ -29,7 +28,8 @@ class EditTransactionState extends State<EditTransactionScreen> {
 
   EditTransactionState(Transaction transaction) {
     _transactionFormViewModel = locator<TransactionFormViewModel>();
-    _transactionFormViewModel.initialize(transaction, editTransactionAction, deleteTransactionAction);
+    _transactionFormViewModel.initialize(
+        transaction, editTransactionAction, deleteTransactionAction);
   }
 
   @override
@@ -44,7 +44,8 @@ class EditTransactionState extends State<EditTransactionScreen> {
           builder: (context, model, child) {
             return TransactionForm.filled(
               primaryActionText: AppLocalizations.of(context).translate('edit'),
-              secondaryActionText: AppLocalizations.of(context).translate('delete'),
+              secondaryActionText:
+                  AppLocalizations.of(context).translate('delete'),
             );
           },
         ),
