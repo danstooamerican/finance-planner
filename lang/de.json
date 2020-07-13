@@ -20,5 +20,6 @@
   "description-required": "Beschreibung benötigt",
   "login-google": "Mit Google anmelden",
   "login-facebook": "Mit Facebook anmelden",
-  "login-error": "Login fehlgeschlagen"
+  "login-error": "Login fehlgeschlagen",
+  "logout":"Abmelden"
 }
