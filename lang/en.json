@@ -20,5 +20,6 @@
   "login": "Login",
   "login-google": "Login with Google",
   "login-facebook": "Login with Facebook",
-  "login-error": "Failed to Log In"
+  "login-error": "Failed to Log In",
+  "logout": "Logout"
 }

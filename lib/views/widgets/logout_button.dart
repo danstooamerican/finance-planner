@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../../app_localizations.dart';
+
 class LogoutButton extends StatelessWidget {
   static final int _logoutButton = 1;
 
@@ -12,7 +14,7 @@ class LogoutButton extends StatelessWidget {
       itemBuilder: (context) => [
         PopupMenuItem(
           value: _logoutButton,
-          child: Text("Logout"),
+          child: Text(AppLocalizations.of(context).translate('logout')),
         ),
       ],
       initialValue: _logoutButton,
