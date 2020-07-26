@@ -6,9 +6,16 @@ Transactions can be assigned to categories to get a better overview over the mai
 ## Current Features
 
 - Social Login with Google and Facebook
-- List of all transactions grouped by month
+- List of all transactions grouped by day
 - Manage transactions (Add, View, Edit, Delete)
 
 ## Planned Features
 
 - Provide statistics for the entered transactions
+
+<img src="readme_assets/login_screen.png" width="48%"> <img src="readme_assets/transaction_overview.png" width="48%">
+<img src="readme_assets/transaction_details.png" width="48%">
+<img src="readme_assets/transaction_add.png" width="48%">
+<img src="readme_assets/transaction_edit.png" width="48%">
+
+
