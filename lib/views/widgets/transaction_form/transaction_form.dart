@@ -72,12 +72,14 @@ class TransactionForm extends HookViewModelWidget<TransactionFormViewModel> {
                   Expanded(
                     child: TypeAheadFormField(
                       textFieldConfiguration: TextFieldConfiguration(
-                        controller: categoryName,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: AppLocalizations.of(context)?.translate('category'),
-                        ),
-                      ),
+                          controller: categoryName,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: AppLocalizations.of(context)?.translate('category'),
+                          ),
+                          onChanged: (text) {
+                            model.categoryName = text;
+                          }),
                       itemBuilder: (context, suggestion) => ListTile(
                         title: Text(suggestion.name),
                         leading: Icon(suggestion.icon),

@@ -24,7 +24,6 @@ class TransactionFormViewModel extends BaseViewModel {
   String get categoryName => _categoryName ?? '';
   set categoryName(String value) {
     _categoryName = value;
-    notifyListeners();
   }
 
   Category _selectedCategory;
@@ -105,6 +104,7 @@ class TransactionFormViewModel extends BaseViewModel {
   }
 
   void submitPrimaryAction() {
+    print(categoryName);
     if (categoryName != null && categoryName.trim().isNotEmpty) {
       int categoryId = 0;
       if (_selectedCategory != null && categoryName == _selectedCategory.name) {
