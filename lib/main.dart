@@ -14,6 +14,7 @@ void main() async {
   setupLocator();
   runApp(
     MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Finance App',
       theme: ThemeData.dark(),
       supportedLocales: [
