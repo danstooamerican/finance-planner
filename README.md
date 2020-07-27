@@ -13,9 +13,9 @@ Transactions can be assigned to categories to get a better overview over the mai
 
 - Provide statistics for the entered transactions
 
-<img src="readme_assets/login_screen.png" width="48%"> <img src="readme_assets/transaction_overview.png" width="48%">
-<img src="readme_assets/transaction_details.png" width="48%">
-<img src="readme_assets/transaction_add.png" width="48%">
-<img src="readme_assets/transaction_edit.png" width="48%">
+<img src="readme_assets/login_screen.jpg" width="48%"> <img src="readme_assets/transaction_overview.jpg" width="48%">
+<img src="readme_assets/transaction_details.jpg" width="48%">
+<img src="readme_assets/transaction_add.jpg" width="48%">
+<img src="readme_assets/transaction_edit.jpg" width="48%">
 
 
