@@ -5,7 +5,6 @@ import 'package:financeplanner/views/widgets/transaction_form/transaction_form.d
 import 'package:financeplanner/views/widgets/transaction_form/transaction_form_viewmodel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:stacked/stacked.dart';
 
 import '../app_localizations.dart';
 import 'main_view/main_screen.dart';
@@ -17,7 +16,7 @@ class EditTransactionScreen extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new EditTransactionState(transaction);
+    return new EditTransactionState();
   }
 }
 
@@ -26,12 +25,6 @@ class EditTransactionState extends State<EditTransactionScreen> {
 
   TransactionFormViewModel _transactionFormViewModel;
 
-  EditTransactionState(Transaction transaction) {
-    _transactionFormViewModel = locator<TransactionFormViewModel>();
-    _transactionFormViewModel.initialize(
-        transaction, editTransactionAction, deleteTransactionAction);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,15 +32,12 @@ class EditTransactionState extends State<EditTransactionScreen> {
         title: Text(AppLocalizations.of(context).translate('edit-transaction')),
       ),
       body: Padding(
-        child: ViewModelBuilder.nonReactive(
-          viewModelBuilder: () => _transactionFormViewModel,
-          builder: (context, model, child) {
-            return TransactionForm.filled(
-              primaryActionText: AppLocalizations.of(context).translate('edit'),
-              secondaryActionText:
-                  AppLocalizations.of(context).translate('delete'),
-            );
-          },
+        child: TransactionForm(
+          transaction: widget.transaction,
+          primaryAction: editTransactionAction,
+          primaryActionText: AppLocalizations.of(context).translate('edit'),
+          secondaryAction: deleteTransactionAction,
+          secondaryActionText: AppLocalizations.of(context).translate('delete'),
         ),
         padding: const EdgeInsets.only(top: 16),
       ),
