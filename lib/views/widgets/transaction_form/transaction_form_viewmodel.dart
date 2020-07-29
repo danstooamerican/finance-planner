@@ -1,123 +1,129 @@
+import 'dart:async';
+
+import 'package:financeplanner/dependency_injection_config.dart';
 import 'package:financeplanner/extensions/extensions.dart';
 import 'package:financeplanner/models/category.dart';
 import 'package:financeplanner/models/transaction.dart';
 import 'package:financeplanner/services/transactions_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:injectable/injectable.dart';
-import 'package:stacked/stacked.dart';
 
-@injectable
-class TransactionFormViewModel extends BaseViewModel {
+class TransactionFormViewModel {
+  final Transaction _startTransaction;
+  int get _transactionId => _startTransaction?.id ?? 0;
+
   Function(Transaction) primaryAction;
 
   //// No form checks are performed before this action is called.
   Function(Transaction) secondaryAction;
 
-  final TransactionService _transactionService;
-  Transaction _transaction;
+  TransactionService _transactionService;
 
   List<Category> _categories;
   List<Category> get categories => _categories;
 
   String _categoryName;
-  String get categoryName => _categoryName ?? '';
-  set categoryName(String value) {
-    _categoryName = value;
-  }
-
-  Category _selectedCategory;
-  Category get selectedCategory => _selectedCategory;
-  set selectedCategory(Category category) {
-    if (category != null) {
-      _selectedCategory = category;
-      _selectedIcon = category.icon;
-      _categoryName = category.name;
-
-      notifyListeners();
-    }
+  String get categoryName => _categoryName;
+  StreamController<String> _categoryNameController = StreamController<String>.broadcast();
+  Sink<String> get inputCategoryName => _categoryNameController;
+  Stream<String> get outputCategoryName => _categoryNameController.stream;
+  bool get categoryEntered {
+    return _categoryName != null && _categoryName.trim().isNotEmpty;
   }
 
   IconData _selectedIcon;
   IconData get selectedIcon => _selectedIcon;
-  set selectedIcon(IconData icon) {
-    if (icon != null) {
-      _selectedIcon = icon;
-
-      if (_selectedCategory != null) {
-        _selectedCategory = Category(id: _selectedCategory.id, name: _selectedCategory.name, icon: icon);
-      }
-
-      notifyListeners();
-    }
-  }
+  StreamController<IconData> _iconController = StreamController<IconData>.broadcast();
+  Sink<IconData> get inputIcon => _iconController;
+  Stream<IconData> get outputIcon => _iconController.stream;
 
   DateTime _selectedDate;
   DateTime get selectedDate => _selectedDate;
-  set selectedDate(DateTime date) {
-    if (date != null && date != selectedDate) {
-      _selectedDate = date;
-      notifyListeners();
-    }
-  }
+  StreamController<DateTime> _dateController = StreamController<DateTime>.broadcast();
+  Sink<DateTime> get inputDate => _dateController;
+  Stream<DateTime> get outputDate => _dateController.stream;
 
-  String title;
+  String _description;
+  String get description => _description;
+  StreamController<String> _descriptionController = StreamController<String>.broadcast();
+  Sink<String> get inputDescription => _descriptionController;
 
-  String description;
+  String _amount;
+  String get amount => _amount;
+  StreamController<String> _amountController = StreamController<String>.broadcast();
+  Sink<String> get inputAmount => _amountController;
 
-  double _amountValue;
-  String get amount => _amountValue?.formatMoneyToEdit() ?? '';
-  set amount(String value) => _amountValue = value.parseMoney();
+  TransactionFormViewModel(
+    this._startTransaction,
+    Function(Transaction) primaryAction,
+    Function(Transaction) secondaryAction,
+  ) {
+    this._transactionService = locator<TransactionService>();
 
-  TransactionFormViewModel(this._transactionService);
+    _initStreams();
 
-  void initialize(Transaction transaction, Function(Transaction) primaryAction, Function(Transaction) secondaryAction) {
-    _transaction = transaction;
     this.primaryAction = primaryAction;
     this.secondaryAction = secondaryAction;
     _categories = List();
     _updateCategories();
-
-    if (_transaction != null && _transaction.id != 0) {
-      selectedCategory = _transaction.category;
-      selectedIcon = _transaction.category.icon;
-      selectedDate = _transaction.date;
-      _amountValue = _transaction.amount;
-      description = _transaction.description;
-    } else {
-      selectedDate = DateTime.now();
-      selectedIcon = Icons.category;
-    }
   }
 
-  void _updateCategories() async {
-    _categories = await runBusyFuture(
-      _transactionService.getCategories(),
-      busyObject: _categories,
-    ).then((value) {
-      if (value != null && value.length > 0 && selectedCategory == null) {
-        selectedCategory = value.first;
-      }
+  void _initStreams() {
+    _description = _startTransaction?.description ?? "";
+    _categoryName = _startTransaction?.category?.name ?? "";
+    _selectedIcon = _startTransaction?.category?.icon ?? Icons.category;
+    _amount = _startTransaction?.amount?.formatMoneyToEdit() ?? null;
+    _selectedDate = _startTransaction?.date ?? DateTime.now();
 
-      return value;
+    _categoryNameController.stream.listen((event) {
+      _categoryName = event;
+
+      Category existingCategory =
+          _categories.firstWhere((element) => element.name == _categoryName, orElse: () => null);
+
+      if (existingCategory != null) {
+        inputIcon.add(existingCategory.icon);
+      }
+    });
+
+    _iconController.stream.listen((event) {
+      _selectedIcon = event;
+    });
+
+    _dateController.stream.listen((event) {
+      _selectedDate = event;
+    });
+
+    _amountController.stream.listen((event) {
+      _amount = event;
+    });
+
+    _descriptionController.stream.listen((event) {
+      _description = event;
     });
   }
 
-  void submitPrimaryAction() {
-    print(categoryName);
-    if (categoryName != null && categoryName.trim().isNotEmpty) {
+  void _updateCategories() async {
+    _transactionService.getCategories().then((value) => _categories = value);
+  }
+
+  Future<void> submitPrimaryAction() async {
+    if (categoryEntered) {
       int categoryId = 0;
-      if (_selectedCategory != null && categoryName == _selectedCategory.name) {
-        categoryId = _selectedCategory.id;
+
+      Category existingCategory =
+          _categories.firstWhere((element) => element.name == _categoryName, orElse: () => null);
+      if (existingCategory != null) {
+        categoryId = existingCategory.id;
       }
 
-      Category category = Category(id: categoryId, name: categoryName, icon: selectedIcon);
+      Category category = Category(id: categoryId, name: _categoryName, icon: selectedIcon);
 
       final Transaction transaction = Transaction(
-        id: _transaction.id,
+        id: _transactionId,
         category: category,
-        description: description.trim(),
-        amount: _amountValue,
+        description: description,
+        amount: amount.parseMoney(),
         dateTime: selectedDate,
       );
 
@@ -126,6 +132,14 @@ class TransactionFormViewModel extends BaseViewModel {
   }
 
   void submitSecondaryAction() {
-    secondaryAction(_transaction);
+    secondaryAction(_startTransaction);
+  }
+
+  void dispose() {
+    _descriptionController.close();
+    _amountController.close();
+    _dateController.close();
+    _iconController.close();
+    _categoryNameController.close();
   }
 }
