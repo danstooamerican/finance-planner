@@ -227,7 +227,7 @@ class TransactionFormState extends State<TransactionForm> {
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: new RaisedButton(
-                      onPressed: viewModel.submitPrimaryAction,
+                      onPressed: submitPrimaryAction,
                       child: Text(widget.primaryActionText),
                     ),
                   ),
@@ -256,9 +256,9 @@ class TransactionFormState extends State<TransactionForm> {
     );
   }
 
-  void submitPrimaryAction(TransactionFormViewModel model) {
+  void submitPrimaryAction() {
     if (_formKey.currentState.validate()) {
-      model.submitPrimaryAction();
+      viewModel.submitPrimaryAction();
     }
   }
 
