@@ -167,13 +167,13 @@ class _DividerTransactionItem extends StatelessWidget {
               _getDate(context, transaction.date),
               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
             ),
-            padding: const EdgeInsets.fromLTRB(8, 16, 0, 0),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
           ),
           const Divider(
             color: Colors.grey,
             height: 12,
             thickness: 1,
-            indent: 4,
+            indent: 16,
             endIndent: 16,
           ),
           Padding(
