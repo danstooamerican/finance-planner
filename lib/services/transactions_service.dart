@@ -12,6 +12,9 @@ import 'package:stacked/stacked.dart';
 
 @lazySingleton
 class TransactionService with ReactiveServiceMixin {
+  RxValue<double> _balance = RxValue<double>(initial: 0);
+  double get balance => _balance.value;
+
   RxValue<List<Transaction>> _transactions = RxValue<List<Transaction>>(initial: List());
   List<Transaction> get transactions => _transactions.value;
 
@@ -93,6 +96,22 @@ class TransactionService with ReactiveServiceMixin {
       List<Transaction> transactions = list.map((model) => Transaction.fromJson(model)).toList();
 
       _transactions.value = transactions;
+    });
+
+    _balance.value = await _getCurrentMonthBalance();
+  }
+
+  Future<double> _getCurrentMonthBalance() async {
+    final token = await _getJWTToken();
+
+    return http.get(
+      GlobalConfiguration().getString("backend") + '/current-month-balance',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        HttpHeaders.authorizationHeader: token,
+      },
+    ).then((value) {
+      return double.parse(value?.body) ?? 0;
     });
   }
 
