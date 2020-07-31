@@ -21,5 +21,6 @@
   "login-google": "Mit Google anmelden",
   "login-facebook": "Mit Facebook anmelden",
   "login-error": "Login fehlgeschlagen",
-  "logout":"Abmelden"
+  "logout":"Abmelden",
+  "empty-list": "Nichts hinzugefügt"
 }

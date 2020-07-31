@@ -21,5 +21,6 @@
   "login-google": "Login with Google",
   "login-facebook": "Login with Facebook",
   "login-error": "Failed to Log In",
-  "logout": "Logout"
+  "logout": "Logout",
+  "empty-list": "Nothing here"
 }
