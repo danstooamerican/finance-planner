@@ -39,13 +39,13 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
   MainScreenState() {
     _scrollController.addListener(() {
       if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
-        if (_fabIsVisible == true && !_animationController.isAnimating) {
+        if (_fabIsVisible && !_animationController.isAnimating) {
           _animationController.forward();
           _fabIsVisible = false;
         }
       } else {
         if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
-          if (_fabIsVisible == false && !_animationController.isAnimating) {
+          if (!_fabIsVisible && !_animationController.isAnimating) {
             _animationController.reverse();
             _fabIsVisible = true;
           }
@@ -64,16 +64,20 @@ class MainScreenState extends State<MainScreen> with SingleTickerProviderStateMi
         floatingActionButton: SlideTransition(
           position: _offsetAnimation,
           child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AddTransactionScreen()),
-              );
-            },
+            onPressed: _navigateToAddTransactionScreen,
             tooltip: AppLocalizations.of(context).translate('add-transaction'),
             child: Icon(Icons.add),
           ),
         ),
+      ),
+    );
+  }
+
+  void _navigateToAddTransactionScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddTransactionScreen(),
       ),
     );
   }

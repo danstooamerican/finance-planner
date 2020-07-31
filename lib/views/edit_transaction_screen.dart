@@ -51,10 +51,11 @@ class EditTransactionState extends State<EditTransactionScreen> {
     _transactionService.deleteTransaction(transaction.id);
 
     Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MainScreen(),
-        ),
-        (Route<dynamic> route) => false);
+      context,
+      MaterialPageRoute(
+        builder: (context) => MainScreen(),
+      ),
+      (Route<dynamic> route) => false,
+    );
   }
 }

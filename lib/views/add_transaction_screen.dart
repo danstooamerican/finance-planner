@@ -23,7 +23,9 @@ class AddTransactionState extends State<AddTransactionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context).translate('add-transaction')),
+        title: Text(
+          AppLocalizations.of(context).translate('add-transaction'),
+        ),
       ),
       body: Padding(
         child: TransactionForm(

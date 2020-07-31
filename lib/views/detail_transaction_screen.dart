@@ -42,16 +42,17 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
                   child: Icon(transaction.category.icon),
                 ),
                 Expanded(
-                    child: Padding(
-                  child: AutoSizeText(
-                    transaction.category.name,
-                    minFontSize: 14,
-                    maxLines: 2,
-                    wrapWords: true,
-                    overflow: TextOverflow.ellipsis,
+                  child: Padding(
+                    child: AutoSizeText(
+                      transaction.category.name,
+                      minFontSize: 14,
+                      maxLines: 2,
+                      wrapWords: true,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    padding: const EdgeInsets.only(right: 64),
                   ),
-                  padding: const EdgeInsets.only(right: 64),
-                )),
+                ),
                 Text(
                   transaction.date.toDateFormat(),
                   style: TextStyle(fontSize: 18),
@@ -69,10 +70,14 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
                   child: Container(
                     height: 60,
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(color: const Color(0xff3b3f42)),
+                    decoration: BoxDecoration(
+                      color: const Color(0xff3b3f42),
+                    ),
                     child: AutoSizeText(
                       transaction.amount.toMoneyFormatWithSign(),
-                      style: TextStyle(color: transaction.amount.toMoneyColor()),
+                      style: TextStyle(
+                        color: transaction.amount.toMoneyColor(),
+                      ),
                       textAlign: TextAlign.center,
                       minFontSize: 30,
                       overflow: TextOverflow.ellipsis,
@@ -89,7 +94,10 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
               children: <Widget>[
                 Text(
                   AppLocalizations.of(context).translate('description'),
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.grey,
+                  ),
                 ),
               ],
             ),
