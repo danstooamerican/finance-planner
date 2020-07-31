@@ -25,6 +25,8 @@ class TransactionListViewModel extends ReactiveViewModel {
     return transactions;
   }
 
+  bool get hasTransactions => (transactions?.length ?? 0) > 0;
+
   int get amtTransactions => _transactionService.transactions.length;
 
   String get balance => _getBalance()?.toMoneyFormatWithSign() ?? '';

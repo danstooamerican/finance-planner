@@ -2,7 +2,6 @@ import 'package:financeplanner/dependency_injection_config.dart';
 import 'package:financeplanner/models/models.dart';
 import 'package:financeplanner/services/transactions_service.dart';
 import 'package:financeplanner/views/widgets/transaction_form/transaction_form.dart';
-import 'package:financeplanner/views/widgets/transaction_form/transaction_form_viewmodel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -22,8 +21,6 @@ class EditTransactionScreen extends StatefulWidget {
 
 class EditTransactionState extends State<EditTransactionScreen> {
   final TransactionService _transactionService = locator<TransactionService>();
-
-  TransactionFormViewModel _transactionFormViewModel;
 
   @override
   Widget build(BuildContext context) {
