@@ -14,6 +14,9 @@ void main() async {
   await GlobalConfiguration().loadFromAsset("app_settings");
 
   setupLocator();
+
+  LoginService loginService = locator<LoginService>();
+
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -30,20 +33,14 @@ void main() async {
       ],
       localeResolutionCallback: (locale, supportedLocales) {
         for (var supportedLocale in supportedLocales) {
-          if (supportedLocale.languageCode == locale.languageCode &&
-              supportedLocale.countryCode == locale.countryCode) {
+          if (supportedLocale == locale) {
             return supportedLocale;
           }
         }
+
         return supportedLocales.first;
       },
-      home: await _isLoggedIn() ? MainScreen() : LoginScreen(),
+      home: await loginService.isLoggedIn() ? MainScreen() : LoginScreen(),
     ),
   );
-}
-
-Future<bool> _isLoggedIn() async {
-  LoginService loginService = locator<LoginService>();
-
-  return await loginService.isLoggedIn();
 }
