@@ -1,9 +1,9 @@
+import 'package:financeplanner/app_localizations.dart';
+import 'package:financeplanner/dependency_injection_config.dart';
+import 'package:financeplanner/services/login_service.dart';
 import 'package:financeplanner/views/login_view/login_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-import '../../app_localizations.dart';
 
 class LogoutButton extends StatelessWidget {
   static final int _logoutButton = 1;
@@ -27,8 +27,10 @@ class LogoutButton extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context) {
-    FlutterSecureStorage().delete(key: "jwt");
+  Future<void> _logout(BuildContext context) async {
+    LoginService loginService = locator<LoginService>();
+
+    await loginService.logout();
 
     Navigator.pushReplacement(
       context,

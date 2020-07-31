@@ -1,4 +1,6 @@
+import 'package:financeplanner/services/login_service.dart';
 import 'package:financeplanner/views/login_view/login_screen.dart';
+import 'package:financeplanner/views/main_view/main_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -35,7 +37,13 @@ void main() async {
         }
         return supportedLocales.first;
       },
-      home: LoginScreen(),
+      home: await _isLoggedIn() ? MainScreen() : LoginScreen(),
     ),
   );
+}
+
+Future<bool> _isLoggedIn() async {
+  LoginService loginService = locator<LoginService>();
+
+  return await loginService.isLoggedIn();
 }
