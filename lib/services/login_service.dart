@@ -29,4 +29,15 @@ class LoginService {
 
     return false;
   }
+
+  Future<bool> isLoggedIn() async {
+    final storage = FlutterSecureStorage();
+    String token = await storage.read(key: "jwt");
+
+    return token != null;
+  }
+
+  Future<void> logout() async {
+    await FlutterSecureStorage().delete(key: "jwt");
+  }
 }
