@@ -29,16 +29,11 @@ class TransactionListViewModel extends ReactiveViewModel {
 
   int get amtTransactions => _transactionService.transactions.length;
 
-  String get balance => _getBalance()?.toMoneyFormatWithSign() ?? '';
-  Color get balanceColor => _getBalance()?.toMoneyColor();
+  String get balance => _transactionService?.balance?.toMoneyFormatWithSign() ?? '';
+  Color get balanceColor => _transactionService?.balance?.toMoneyColor();
 
   TransactionListViewModel(this._transactionService) {
     updateTransactionList();
-  }
-
-  double _getBalance() {
-    return _transactionService.transactions
-        ?.fold(0, (previousValue, Transaction element) => previousValue + element.amount);
   }
 
   Future<void> updateTransactionList() async {

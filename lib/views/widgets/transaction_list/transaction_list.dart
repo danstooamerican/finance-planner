@@ -4,9 +4,9 @@ import 'package:financeplanner/extensions/extensions.dart';
 import 'package:financeplanner/models/transaction.dart';
 import 'package:financeplanner/views/widgets/logout_button.dart';
 import 'package:financeplanner/views/widgets/transaction_list/transaction_list_viewmodel.dart';
-import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
 
 import '../../../app_localizations.dart';
@@ -39,29 +39,15 @@ class TransactionList extends StatelessWidget {
                     ),
                     background: Stack(
                       children: [
-                        Positioned(
-                          left: 16,
-                          top: 16,
-                          child: Container(
-                            width: 128,
-                            height: 48,
-                            child: Hero(
-                              tag: 'wallet',
-                              child: FlareActor(
-                                'assets/animations/wallet.flr',
-                                animation: 'Idle',
-                                fit: BoxFit.contain,
-                                alignment: Alignment.centerLeft,
-                              ),
-                            ),
-                          ),
-                        ),
                         Positioned.fill(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               AutoSizeText(
-                                AppLocalizations.of(context).translate('balance'),
+                                DateFormat.MMMM(AppLocalizations.of(context).locale.toLanguageTag())
+                                        .format(DateTime.now()) +
+                                    " " +
+                                    AppLocalizations.of(context).translate('balance'),
                                 style: TextStyle(color: Colors.grey),
                                 textAlign: TextAlign.left,
                                 minFontSize: 30,
