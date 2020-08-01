@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
@@ -19,7 +20,18 @@ class TransactionService with ReactiveServiceMixin {
   List<Transaction> get transactions => _transactions.value;
 
   TransactionService() {
-    listenToReactiveValues([_transactions]);
+    listenToReactiveValues([_transactions, _balance]);
+  }
+
+  Future<Map> _getHeader() async {
+    final token = await _getJWTToken();
+
+    Map<String, String> header = HashMap.from({
+      'Content-Type': 'application/json; charset=UTF-8',
+      HttpHeaders.authorizationHeader: token,
+    });
+
+    return header;
   }
 
   Future<String> _getJWTToken() async {
@@ -30,15 +42,6 @@ class TransactionService with ReactiveServiceMixin {
     }
 
     return token;
-  }
-
-  Future<Map> _getHeader() async {
-    final token = await _getJWTToken();
-
-    return {
-      'Content-Type': 'application/json; charset=UTF-8',
-      HttpHeaders.authorizationHeader: token,
-    };
   }
 
   String _getUrl(String endpoint) {
@@ -86,14 +89,14 @@ class TransactionService with ReactiveServiceMixin {
       _getUrl('transactions'),
       headers: await _getHeader(),
     )
-        .then((value) {
+        .then((value) async {
       Iterable list = json.decode(utf8.decode(value.bodyBytes));
       List<Transaction> transactions = list.map((model) => Transaction.fromJson(model)).toList();
 
+      _balance.value = await _getCurrentMonthBalance();
+
       _transactions.value = transactions;
     });
-
-    _balance.value = await _getCurrentMonthBalance();
   }
 
   Future<double> _getCurrentMonthBalance() async {

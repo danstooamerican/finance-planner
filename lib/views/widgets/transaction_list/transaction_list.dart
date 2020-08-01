@@ -44,18 +44,19 @@ class TransactionList extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               AutoSizeText(
-                                DateFormat.MMMM(AppLocalizations.of(context).locale.toLanguageTag())
-                                        .format(DateTime.now()) +
-                                    " " +
-                                    AppLocalizations.of(context).translate('balance'),
-                                style: TextStyle(color: Colors.grey),
+                                _getMonthName(context) + " " + AppLocalizations.of(context).translate('balance'),
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                ),
                                 textAlign: TextAlign.left,
                                 minFontSize: 30,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               AutoSizeText(
                                 model.balance,
-                                style: TextStyle(color: model.balanceColor),
+                                style: TextStyle(
+                                  color: model.balanceColor,
+                                ),
                                 textAlign: TextAlign.left,
                                 minFontSize: 50,
                                 overflow: TextOverflow.ellipsis,
@@ -79,6 +80,10 @@ class TransactionList extends StatelessWidget {
       },
       viewModelBuilder: () => locator<TransactionListViewModel>(),
     );
+  }
+
+  String _getMonthName(BuildContext context) {
+    return DateFormat.MMMM(AppLocalizations.of(context).locale.toLanguageTag()).format(DateTime.now());
   }
 
   Widget _buildListBody(BuildContext context, TransactionListViewModel model) {

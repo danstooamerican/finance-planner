@@ -110,7 +110,9 @@ class DetailTransactionState extends State<DetailTransactionScreen> {
                 Flexible(
                   child: Text(
                     transaction.description,
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ],
