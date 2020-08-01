@@ -32,16 +32,24 @@ class TransactionService with ReactiveServiceMixin {
     return token;
   }
 
-  Future createTransaction(Transaction transaction) async {
+  Future<Map> _getHeader() async {
     final token = await _getJWTToken();
 
+    return {
+      'Content-Type': 'application/json; charset=UTF-8',
+      HttpHeaders.authorizationHeader: token,
+    };
+  }
+
+  String _getUrl(String endpoint) {
+    return GlobalConfiguration().getString("backend") + '/' + endpoint;
+  }
+
+  Future createTransaction(Transaction transaction) async {
     return http
         .post(
-      GlobalConfiguration().getString("backend") + '/add-transaction',
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: token,
-      },
+      _getUrl('add-transaction'),
+      headers: await _getHeader(),
       body: jsonEncode(transaction),
     )
         .then((value) {
@@ -53,45 +61,32 @@ class TransactionService with ReactiveServiceMixin {
   }
 
   Future editTransaction(Transaction transaction) async {
-    final token = await _getJWTToken();
-
     return http
         .post(
-          GlobalConfiguration().getString("backend") + '/edit-transaction',
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            HttpHeaders.authorizationHeader: token,
-          },
+          _getUrl('edit-transaction'),
+          headers: await _getHeader(),
           body: jsonEncode(transaction),
         )
         .then((value) => fetchTransactions());
   }
 
   Future deleteTransaction(int id) async {
-    final token = await _getJWTToken();
-
     return http
         .post(
-          GlobalConfiguration().getString("backend") + '/delete-transaction',
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-            HttpHeaders.authorizationHeader: token,
-          },
+          _getUrl('delete-transaction'),
+          headers: await _getHeader(),
           body: jsonEncode(id),
         )
         .then((value) => fetchTransactions());
   }
 
   Future<void> fetchTransactions() async {
-    final token = await _getJWTToken();
-
-    http.get(
-      GlobalConfiguration().getString("backend") + '/transactions',
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: token,
-      },
-    ).then((value) {
+    http
+        .get(
+      _getUrl('transactions'),
+      headers: await _getHeader(),
+    )
+        .then((value) {
       Iterable list = json.decode(utf8.decode(value.bodyBytes));
       List<Transaction> transactions = list.map((model) => Transaction.fromJson(model)).toList();
 
@@ -102,29 +97,23 @@ class TransactionService with ReactiveServiceMixin {
   }
 
   Future<double> _getCurrentMonthBalance() async {
-    final token = await _getJWTToken();
-
-    return http.get(
-      GlobalConfiguration().getString("backend") + '/current-month-balance',
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: token,
-      },
-    ).then((value) {
+    return http
+        .get(
+      _getUrl('current-month-balance'),
+      headers: await _getHeader(),
+    )
+        .then((value) {
       return double.parse(value?.body) ?? 0;
     });
   }
 
   Future<List<Category>> getCategories() async {
-    final token = await _getJWTToken();
-
-    return http.get(
-      GlobalConfiguration().getString("backend") + '/categories',
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        HttpHeaders.authorizationHeader: token,
-      },
-    ).then((value) {
+    return http
+        .get(
+      _getUrl('categories'),
+      headers: await _getHeader(),
+    )
+        .then((value) {
       Iterable list = json.decode(utf8.decode(value.bodyBytes));
 
       return list.map((model) => Category.fromJson(model)).toList();

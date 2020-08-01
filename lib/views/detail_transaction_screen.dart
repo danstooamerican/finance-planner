@@ -1,6 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:financeplanner/extensions/extensions.dart';
-import 'package:financeplanner/models/models.dart';
+import 'package:financeplanner/models/transaction.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:financeplanner/extensions/extensions.dart';
-import 'package:financeplanner/models/models.dart';
+import 'package:financeplanner/models/transaction.dart';
 import 'package:financeplanner/services/transactions_service.dart';
 import 'package:injectable/injectable.dart';
 import 'package:stacked/stacked.dart';

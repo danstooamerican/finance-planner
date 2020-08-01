@@ -1,4 +1,4 @@
-import 'package:financeplanner/models/models.dart';
+import 'package:financeplanner/models/transaction.dart';
 import 'package:financeplanner/services/transactions_service.dart';
 import 'package:financeplanner/views/widgets/transaction_form/transaction_form.dart';
 import 'package:flutter/cupertino.dart';

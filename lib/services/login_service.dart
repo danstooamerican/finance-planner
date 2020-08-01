@@ -7,10 +7,7 @@ import 'package:injectable/injectable.dart';
 class LoginService {
   Future<bool> login(String authService) async {
     final result = await FlutterWebAuth.authenticate(
-      url: GlobalConfiguration().getString("backend") +
-          "/oauth2/authorize/" +
-          authService +
-          "?redirect_uri=financeplanner://oauth2/redirect",
+      url: _buildAuthenticationUrl(authService),
       callbackUrlScheme: "financeplanner",
     ).catchError((e) {
       return null;
@@ -28,6 +25,13 @@ class LoginService {
     }
 
     return false;
+  }
+
+  String _buildAuthenticationUrl(String authService) {
+    return GlobalConfiguration().getString("backend") +
+        "/oauth2/authorize/" +
+        authService +
+        "?redirect_uri=financeplanner://oauth2/redirect";
   }
 
   Future<bool> isLoggedIn() async {
